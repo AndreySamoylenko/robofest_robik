@@ -17,6 +17,7 @@ BLUE=pyb.LED(4)
 ms=motor('X6','X7','X8','X5','X4','X3')
 sens=sensor('Y11','Y12','X11','X12')
 p_in = Pin('Y9', Pin.IN, Pin.PULL_UP)
+b = Pin('X10', Pin.IN)
 
 u=0
 kp=0.15
@@ -78,70 +79,72 @@ def turn(speed):
 def calibration():
     f=open("calibration.txt",'w')
     BLUE.on()
-    while p_in==0:
+    while p_in.value()==0:
         delay(1)
     delay(100)
     for i in range(1000):
-        l_min[i]=int(dat(1))
-        r_min[i]=int(dat(2))
+        l_min[i]=int(sens.dat(1))
+        r_min[i]=int(sens.dat(2))
         delay(1)
     l_min.sort()
     r_min.sort()
 
     BLUE.off()
-    while p_in==0:
+    while p_in.value()==0:
         delay(1)
     delay(100)
     for i in range(1000):
-        l_max[i]=int(dat(1))
-        r_max[i]=int(dat(2))
+        l_max[i]=int(sens.dat(1))
+        r_max[i]=int(sens.dat(2))
         delay(1)
     l_max.sort()
     r_max.sort()
-    f.write(str(l_max[500]))
-    f.write(str(l_min[500]))
-    f.write(str(r_max[500]))
-    f.write(str(r_min[500]))
+    f.write(str(l_max[500])+'\n')
+    f.write(str(l_min[500])+'\n')
+    f.write(str(r_max[500])+'\n')
+    f.write(str(r_min[500])+'\n')
 
 
     RED.on()
-    while p_in==0:
+    while p_in.value()==0:
         delay(1)
     delay(100)
     for i in range(1000):
-        l_min[i]=int(dat(3))
-        r_min[i]=int(dat(4))
+        l_min[i]=int(sens.dat(3))
+        r_min[i]=int(sens.dat(4))
         delay(1)
     l_min.sort()
     r_min.sort()
 
 
     RED.off()
-    while p_in==0:
+    while p_in.value()==0:
         delay(1)
     delay(100)
     for i in range(1000):
-        l_max[i]=int(dat(3))
-        r_max[i]=int(dat(4))
+        l_max[i]=int(sens.dat(3))
+        r_max[i]=int(sens.dat(4))
         delay(1)
     l_max.sort()
     r_max.sort()
-    f.write(str(l_max[500]))
-    f.write(str(l_min[500]))
-    f.write(str(r_max[500]))
-    f.write(str(r_min[500]))
+    f.write(str(l_max[500])+'\n')
+    f.write(str(l_min[500])+'\n')
+    f.write(str(r_max[500])+'\n')
+    f.write(str(r_min[500])+'\n')
     RED.on()
     f.close()
-    f=open('calibration.txt','r')
-    for i in range(4):
-        Max[i]=f.readline()
-        Min[i]=f.readline()
+
 
 
 
 def main():
     YELLOW.on()
-    while p_in==0:
+    f = open('calibration.txt', 'r')
+    for i in range(4):
+        Max[i] = int(f.readline())
+        Min[i] = int(f.readline())
+    f.close()
+    while p_in.value()==0:
         delay(1)
 
     YELLOW.off()
@@ -157,15 +160,9 @@ def main():
     turn(-50)
 
 
-
-
-
-
-
-d1,d2=0,0
-state=0
-white=4096
-black=0
-
 print("starting ---> SUCCESSFUL")
 
+if b.value()==0:
+    calibration()
+else:
+    main()

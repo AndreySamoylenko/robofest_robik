@@ -11,10 +11,10 @@ class sensor:
 
     def dat(self,i):
         if i==1:
-            return self.fl
+            return self.fl.read()
         elif i==2:
-            return self.fr
+            return self.fr.read()
         elif i==3:
-            return self.bl
+            return self.bl.read()
         elif i==4:
-            return self.br
+            return self.br.read()

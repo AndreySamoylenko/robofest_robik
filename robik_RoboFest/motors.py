@@ -59,3 +59,4 @@ class motor:
         self.Ma2.high()
         self.Mb1.high()
         self.Mb2.high()
+        pyb.delay(200)

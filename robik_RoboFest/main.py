@@ -3,8 +3,8 @@ import pyb
 from motors import motor
 from IR import sensor
 
-servo1 = pyb.Servo(1)  # пин для сервопривода
-servo1.angle(0)
+boch = pyb.Servo(1)  # пин для сервопривода
+boch.angle(-90)
 cub = pyb.Servo(2)  # пин для сервопривода
 cub.angle(90)
 
@@ -39,9 +39,10 @@ def dat(d):
     nval = int(100 * float(D - Min[d - 1]) / (Max[d - 1] - Min[d - 1]))
     return nval
 
+
 def pd_x_f(speed, kp, kd):
     E = 0
-    while dat(1) < 60 or dat(2) < 60:
+    while dat(1) < 80 or dat(2) < 80:
         e = dat(1) - dat(2)
         u = e * kp + E * kd
         m1, m2 = speed - u, speed + u
@@ -52,9 +53,10 @@ def pd_x_f(speed, kp, kd):
     ms.stop()
     delay(50)
     ms.drive(speed, speed)
-    d=int(16500/speed)
+    d = int(14000 / speed)
     delay(d)
     ms.stop()
+    delay(200)
 
 def pd_x_b(speed, kp, kd):
     E = 0
@@ -63,43 +65,132 @@ def pd_x_b(speed, kp, kd):
         u = e * kp + E * kd
         m1, m2 = speed - u, speed + u
 
-        if m1 <20: m1 = 20
-        if m2 <20: m2 = 20
+        if m1 < 20: m1 = 20
+        if m2 < 20: m2 = 20
         ms.drive(-m1, -m2)
         E = e
     ms.stop()
     delay(50)
     ms.drive(-speed, -speed)
-    d = int(16500 / speed)
+    d = int(14000 / speed)
     delay(d)
     ms.stop()
+    delay(200)
 
 def turn(speed):
-    ms.stop()
-    delay(100)
     y = 0
     if speed > 0: y = 1
     if speed < 0: y = 2
 
     d1 = dat(y)
     ms.drive(-speed, speed)
-    pyb.delay(150)
-    while d1 < 60:
+    pyb.delay(200)
+    while d1 < 85:
         d1 = dat(y)
         ms.drive(-speed, speed)
         pyb.delay(1)
-    delay(int(3000/speed))
+
+    delay(int(5200 / speed))
     if speed > 0:
         ms.drive(100, -100)
     else:
         ms.drive(-100, 100)
     delay(10)
     ms.stop()
-    delay(50)
+    delay(200)
 
 def pr():
     while 1:
-        print(sens.dat(1),sens.dat(2),sens.dat(3),sens.dat(4))
+        print(sens.dat(1), sens.dat(2), sens.dat(3), sens.dat(4))
+
+def main():
+    YELLOW.on()
+    f = open('calibration.txt', 'r')
+    for i in range(4):
+        Max[i] = int(f.readline())
+        Min[i] = int(f.readline())
+    f.close()
+    while p_in.value() == 0:
+        delay(1)
+    # pr()
+
+    YELLOW.off()
+    cub.angle(-110)
+    delay(300)
+    ms.drive(60, 60)
+    delay(600)
+
+
+    YELLOW.on()
+    pd_x_f(50, 0.5, 0.03)
+
+    turn(-50)
+
+    pd_x_b(70, 0.5, 0.03)
+
+    turn(-50)
+
+    pd_x_b(50, 0.7, 0.07)
+
+    ms.drive(-40, -40)
+    delay(300)
+    ms.stop()
+
+    boch.angle(0)
+    delay(600)
+
+    ms.drive(-50, 50)
+    delay(720)
+    ms.stop()
+    delay(50)
+
+    ms.drive(-40,-40)
+    delay(500)
+
+    ms.stop()
+    cub.angle(0)
+    delay(400)
+
+    ms.drive(-50, -50)
+    delay(300)
+    ms.stop()
+
+    pd_x_b(50, 0.6, 0.04)
+
+    turn(50)
+
+    pd_x_b(50, 0.6, 0.04)
+
+    ms.drive(-50,50)
+    delay(280)
+    ms.stop()
+
+    ms.drive(-60,-60)
+    delay(600)
+    ms.stop()
+    ms.drive(40,40)
+    delay(900)
+    ms.stop()
+
+    turn(-50)
+    ms.drive(50,-50)
+    delay(100)
+    turn(-50)
+
+    pd_x_f(50,0.4,0.03)
+
+    cub.angle(-90)
+    delay(200)
+
+    pd_x_b(50,0.5,0.04)
+
+
+
+
+    # cub.angle(0)
+    # pd_x_b(50,0.7,0.09)
+
+print("starting ---> SUCCESSFUL")
 
 def calibration():
     f = open("calibration.txt", 'w')
@@ -157,34 +248,6 @@ def calibration():
     RED.on()
     f.close()
     GREEN.on()
-
-def main():
-    YELLOW.on()
-    f = open('calibration.txt', 'r')
-    for i in range(4):
-        Max[i] = int(f.readline())
-        Min[i] = int(f.readline())
-    f.close()
-    while p_in.value() == 0:
-        delay(1)
-    # pr()
-
-    YELLOW.off()
-    ms.drive(60, 60)
-    delay(600)
-    cub.angle(-110)
-
-    YELLOW.on()
-    pd_x_f(50, 0.5, 0.03)
-    turn(-50)
-    pd_x_b(70, 0.5, 0.03)
-    turn(-50)
-    pd_x_b(50, 0.7, 0.07)
-    # cub.angle(0)
-    # pd_x_b(50,0.7,0.09)
-
-
-print("starting ---> SUCCESSFUL")
 
 if b.value() == 0:
     calibration()

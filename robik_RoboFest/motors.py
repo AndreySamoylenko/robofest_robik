@@ -54,3 +54,8 @@ class motor:
             self.Mb2.low()
             self.Mb1.high()
             self.ch2.pulse_width_percent(-spB)
+    def stop(self):
+        self.Ma1.high()
+        self.Ma2.high()
+        self.Mb1.high()
+        self.Mb2.high()

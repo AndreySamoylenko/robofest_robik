@@ -23,9 +23,13 @@ kp=0.15
 kd=0.05
 E=0
 
-l_min=range(1000)
-r_min=range(1000)
+l_min=list(range(1000))
+r_min=list(range(1000))
+l_max=list(range(1000))
+r_max=list(range(1000))
 
+Max=[0,0,0,0]
+Min=[0,0,0,0]
 
 def dat(d):
     D=sens.dat(d)
@@ -44,10 +48,13 @@ def pd_x_f(speed,kp,kd):
         if m1 < -20: m1 = -20
         ms.drive(m1,m2)
         E=e
+    ms.stop()
 
 
 
 def turn(speed):
+    ms.stop()
+    delay(100)
     y=0
     if speed>0:y=2
     if speed<0:y=1
@@ -66,17 +73,90 @@ def turn(speed):
         ms.drive(100,-100)
     delay(10)
     ms.stop()
+    delay(200)
 
 def calibration():
     f=open("calibration.txt",'w')
     BLUE.on()
     while p_in==0:
         delay(1)
+    delay(100)
     for i in range(1000):
-        l_min[i]=dat(1)
-        r_min[i]=dat(2)
+        l_min[i]=int(dat(1))
+        r_min[i]=int(dat(2))
+        delay(1)
+    l_min.sort()
+    r_min.sort()
+
+    BLUE.off()
+    while p_in==0:
+        delay(1)
+    delay(100)
+    for i in range(1000):
+        l_max[i]=int(dat(1))
+        r_max[i]=int(dat(2))
+        delay(1)
+    l_max.sort()
+    r_max.sort()
+    f.write(str(l_max[500]))
+    f.write(str(l_min[500]))
+    f.write(str(r_max[500]))
+    f.write(str(r_min[500]))
+
+
+    RED.on()
+    while p_in==0:
+        delay(1)
+    delay(100)
+    for i in range(1000):
+        l_min[i]=int(dat(3))
+        r_min[i]=int(dat(4))
+        delay(1)
+    l_min.sort()
+    r_min.sort()
+
+
+    RED.off()
+    while p_in==0:
+        delay(1)
+    delay(100)
+    for i in range(1000):
+        l_max[i]=int(dat(3))
+        r_max[i]=int(dat(4))
+        delay(1)
+    l_max.sort()
+    r_max.sort()
+    f.write(str(l_max[500]))
+    f.write(str(l_min[500]))
+    f.write(str(r_max[500]))
+    f.write(str(r_min[500]))
+    RED.on()
+    f.close()
+    f=open('calibration.txt','r')
+    for i in range(4):
+        Max[i]=f.readline()
+        Min[i]=f.readline()
+
+
 
 def main():
+    YELLOW.on()
+    while p_in==0:
+        delay(1)
+
+    YELLOW.off()
+    ms.drive(60,60)
+    delay(600)
+
+    YELLOW.on()
+    pd_x_f(50,0.7,0.07)
+    turn(50)
+    pd_x_f(50, 0.7, 0.07)
+    turn(50)
+    pd_x_f(50, 0.7, 0.07)
+    turn(-50)
+
+
 
 
 
@@ -88,56 +168,4 @@ white=4096
 black=0
 
 print("starting ---> SUCCESSFUL")
-while 1:
-    d1,d2=dat(1),dat(2)
-    if state==0:
-        ms.drive(0,0)
-        if p_in.value() == 1:
-            state=1
 
-    if state==1:
-        i=0
-        while i<1000:
-            d1,d2=sens.dat(1),sens.dat(2)
-            ms.drive(30,30)
-            if (d1+d2)/2<white:white=(d1+d2)/2
-            if (d1+d2)/2>black:black=(d1+d2)/2
-            pyb.delay(1)
-            i+=1
-        state=2
-
-    if state==2:
-        GREEN.on()
-        d1,d2=Map(sens.dat(1),white,black,0,100),Map(sens.dat(2),white,black,0,100)
-        e=d1-d2
-        pd(d1,d2,40,E)
-        E=e
-        if x_road(d1,d2):
-            state=3
-            GREEN.off()
-
-        # print(sens.fl.read(), sens.fr.read(),u)
-    if state==3:
-        RED.on()
-
-        pyb.delay(200)
-
-        ms.drive(20,20)
-        pyb.delay(200)
-        ms.stop()
-
-        ms.drive(20,-20)
-        pyb.delay(300)
-
-        d1,d2=Map(sens.dat(1),white,black,0,100),Map(sens.dat(2),white,black,0,100)
-        turn(1,-20)
-
-        i=0
-        while i < 100:
-            i+=1
-            d1,d2=Map(sens.dat(1),white,black,0,100),Map(sens.dat(2),white,black,0,100)
-            pd(d1,d2,30,0)
-            pyb.delay(1)
-
-        state=2
-        RED.off()

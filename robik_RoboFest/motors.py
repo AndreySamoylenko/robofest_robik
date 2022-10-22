@@ -19,7 +19,7 @@ class motor:
         self.Mb2 = Pin(self.b2, Pin.OUT_PP)
 
         self.Spa = Pin(self.pwma)
-        self.tim1 = Timer(1, freq=10000)
+        self.tim1 = Timer(14, freq=10000)
         self.ch1 = self.tim1.channel(1, Timer.PWM, pin=self.Spa)  # пины для работы с драйвером
 
         self.Spb = Pin(self.pwmb)
@@ -27,18 +27,19 @@ class motor:
         self.ch2 = self.tim.channel(3, Timer.PWM, pin=self.Spb)
 
     def drive(self,spA,spB):
+        if spA > 100:
+            spA = 100
+        if spA < -100:
+            spA = -100
+
         if spA > 0:
-            if spA - 100 > 0:
-                spA = 100
             self.Ma1.low()
             self.Ma2.high()
-            self.ch1.pulse_width_percent(100-spA)
+            self.ch1.pulse_width_percent(spA)
         else:
-            if 100 - spA > 200:
-                spA = -100
             self.Ma2.low()
             self.Ma1.high()
-            self.ch1.pulse_width_percent(-100+spA)
+            self.ch1.pulse_width_percent(-spA)
 
         if  spB>100:
             spB=100

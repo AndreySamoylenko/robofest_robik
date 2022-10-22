@@ -23,46 +23,61 @@ kp=0.15
 kd=0.05
 E=0
 
+l_min=range(1000)
+r_min=range(1000)
 
-def Map(val,min1,max1,min2,max2):
-    nval=(((val - min1) * (max2 - min2) / (max1 - min1)) + min2)
+
+def dat(d):
+    D=sens.dat(d)
+    if D>Max[d-1]:D=Max[d-1]
+    if D<Min[d-1]:D=Min[d - 1]
+    nval=int(100 * float(D - Min[d-1]) / (Max[d-1] - Min[d-1]))
     return nval
 
-def pd(d1,d2,speed,E):
-    e=d1-d2
-    u = e * kp + E * kd
-    ms.drive(speed - u, speed + u)
+def pd_x_f(speed,kp,kd):
+    E=0
+    while dat(1)<60 and dat(2)<60:
+        e=dat(1)-dat(2)
+        u = e * kp + E * kd
+        m1,m2=speed - u, speed + u
+        if m1<20:m1=20
+        if m1 < -20: m1 = -20
+        ms.drive(m1,m2)
+        E=e
 
-def x_road(d1,d2):
-    return bool(d1>90 and d2>90)
 
-def turn(number,speed):
+
+def turn(speed):
     y=0
     if speed>0:y=2
     if speed<0:y=1
 
-    d1 = Map(sens.dat(y), white, black, 0, 100)
-    while d1 > 60:
-        d1 = Map(sens.dat(1), white, black, 0, 100)
-        ms.drive(speed, -speed)
-        pyb.delay(1)
+    d1 = dat(y)
+
     pyb.delay(100)
     while d1 < 60:
-        d1 = Map(sens.dat(1), white, black, 0, 100)
+        d1 = dat(y)
         ms.drive(speed, -speed)
         pyb.delay(1)
+    delay(75)
+    if speed>0:
+        ms.drive(-100,100)
+    else:
+        ms.drive(100,-100)
+    delay(10)
+    ms.stop()
 
-    if number==2:
-        d1 = Map(sens.dat(y), white, black, 0, 100)
-        while d1 > 60:
-            d1 = Map(sens.dat(1), white, black, 0, 100)
-            ms.drive(speed, -speed)
-            pyb.delay(1)
-        pyb.delay(100)
-        while d1 < 60:
-            d1 = Map(sens.dat(1), white, black, 0, 100)
-            ms.drive(speed, -speed)
-            pyb.delay(1)
+def calibration():
+    f=open("calibration.txt",'w')
+    BLUE.on()
+    while p_in==0:
+        delay(1)
+    for i in range(1000):
+        l_min[i]=dat(1)
+        r_min[i]=dat(2)
+
+def main():
+
 
 
 
@@ -74,7 +89,7 @@ black=0
 
 print("starting ---> SUCCESSFUL")
 while 1:
-    d1,d2=Map(sens.dat(1),white,black,0,100),Map(sens.dat(2),white,black,0,100)
+    d1,d2=dat(1),dat(2)
     if state==0:
         ms.drive(0,0)
         if p_in.value() == 1:

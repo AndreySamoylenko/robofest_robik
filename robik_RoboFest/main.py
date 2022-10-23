@@ -2,6 +2,7 @@ from pyb import delay, Pin, ADC, Timer
 import pyb
 from motors import motor
 from IR import sensor
+from color import col
 
 boch = pyb.Servo(1)  # пин для сервопривода
 boch.angle(-90)
@@ -15,6 +16,7 @@ BLUE = pyb.LED(4)
 
 ms = motor('X6', 'X7', 'X8', 'X5', 'X4', 'X3')
 sens = sensor('Y11', 'Y12', 'X11', 'X12')
+color=col('Y1','Y2','Y3')
 p_in = Pin('Y9', Pin.IN, Pin.PULL_UP)
 b = Pin('X10', Pin.IN)
 
@@ -103,29 +105,7 @@ def pr():
     while 1:
         print(sens.dat(1), sens.dat(2), sens.dat(3), sens.dat(4))
 
-def main():
-    YELLOW.on()
-    f = open('calibration.txt', 'r')
-    for i in range(4):
-        Max[i] = int(f.readline())
-        Min[i] = int(f.readline())
-    f.close()
-    while p_in.value() == 0:
-        delay(1)
-    # pr()
-
-    YELLOW.off()
-    cub.angle(-110)
-    delay(300)
-    ms.drive(60, 60)
-    delay(600)
-
-
-    YELLOW.on()
-    pd_x_f(50, 0.5, 0.03)
-
-    turn(-50)
-
+def black():
     pd_x_b(70, 0.5, 0.03)
 
     turn(-50)
@@ -144,7 +124,7 @@ def main():
     ms.stop()
     delay(50)
 
-    ms.drive(-40,-40)
+    ms.drive(-40, -40)
     delay(500)
 
     ms.stop()
@@ -161,28 +141,57 @@ def main():
 
     pd_x_b(50, 0.6, 0.04)
 
-    ms.drive(-50,50)
+    ms.drive(-50, 50)
     delay(280)
     ms.stop()
 
-    ms.drive(-60,-60)
+    ms.drive(-60, -60)
     delay(600)
     ms.stop()
-    ms.drive(40,40)
+    ms.drive(40, 40)
     delay(900)
     ms.stop()
 
     turn(-50)
-    ms.drive(50,-50)
+    ms.drive(50, -50)
     delay(100)
     turn(-50)
 
-    pd_x_f(50,0.4,0.03)
+    pd_x_f(50, 0.4, 0.03)
 
     cub.angle(-90)
     delay(200)
 
-    pd_x_b(50,0.5,0.04)
+    pd_x_b(50, 0.5, 0.04)
+
+def main():
+    YELLOW.on()
+    f = open('calibration.txt', 'r')
+    for i in range(4):
+        Max[i] = int(f.readline())
+        Min[i] = int(f.readline())
+    f.close()
+    while p_in.value() == 0:
+        delay(1)
+    # pr()
+
+    YELLOW.off()
+    cub.angle(-110)
+    while 1:
+        print(color.RGB())
+    # delay(300)
+    # ms.drive(60, 60)
+    # delay(600)
+    #
+    #
+    # YELLOW.on()
+    # pd_x_f(50, 0.5, 0.03)
+    #
+    # turn(-50)
+    # black()
+
+
+
 
 
 

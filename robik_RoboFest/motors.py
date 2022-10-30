@@ -15,8 +15,8 @@ class motor:
         self.Ma1 = Pin(self.a1, Pin.OUT_PP)
         self.Ma2 = Pin(self.a2, Pin.OUT_PP)
 
-        self.Mb1 = Pin(self.b1, Pin.OUT_PP)
-        self.Mb2 = Pin(self.b2, Pin.OUT_PP)
+        self.Mb1 = Pin(self.b2, Pin.OUT_PP)
+        self.Mb2 = Pin(self.b1, Pin.OUT_PP)
 
         self.Spa = Pin(self.pwma)
         self.tim1 = Timer(14, freq=10000)
@@ -25,13 +25,15 @@ class motor:
         self.Spb = Pin(self.pwmb)
         self.tim = Timer(2, freq=10000)
         self.ch2 = self.tim.channel(3, Timer.PWM, pin=self.Spb)
-
+    def calc(self,val,min1,max1,min2,max2):
+        nval=((val-min1)/(max1-min1))*max2+min2
+        return nval
     def drive(self,spA,spB):
-        if spA > 100:
-            spA = 100
-        if spA < -100:
-            spA = -100
-
+        if spA > 255:
+            spA = 255
+        if spA < -255:
+            spA = -255
+        spA=self.calc(spA,0,255,0,100)
         if spA > 0:
             self.Ma1.low()
             self.Ma2.high()
@@ -45,7 +47,7 @@ class motor:
             spB=100
         if spB <-100:
             spB =-100
-
+        spB=self.calc(spB,0,255,0,100)
         if spB > 0:
             self.Mb1.low()
             self.Mb2.high()
@@ -56,7 +58,7 @@ class motor:
             self.ch2.pulse_width_percent(-spB)
     def stop(self):
         self.Ma1.high()
-        self.Ma2.high()
         self.Mb1.high()
+        self.Ma2.high()
         self.Mb2.high()
         pyb.delay(200)

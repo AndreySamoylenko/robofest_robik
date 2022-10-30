@@ -19,11 +19,18 @@ class col:
         self.s3.low()
         self.s2.low()
         R=self.pulse(self.out)
+        self.s2.low()
         self.s3.high()
         B = self.pulse(self.out)
+        self.s3.high()
         self.s2.high()
         G = self.pulse(self.out)
-        return R,G,B
+        self.s3.low()
+        self.s2.high()
+        W = self.pulse(self.out)
+
+
+        return R,G,B,W
 
 
 

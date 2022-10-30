@@ -113,7 +113,7 @@ def pid_x_b(speed, kp, ki, kd,boost_time=400, d=180):
 def pid_x_f(speed, kp, ki, kd,boost_time=400, d=180):
     pid_x(speed,kp,ki,kd,1,2,boost_time,d,1)
 
-def pid_t(speed, kp, ki, kd, time,way, d1=1,d2=2):
+def pid_t(speed, kp, ki, kd, time,way, d1=1,d2=2,stop_fl=1):
     global err, sum, error
     mil = millis()
     while millis()-mil<time:
@@ -146,7 +146,8 @@ def pid_t(speed, kp, ki, kd, time,way, d1=1,d2=2):
             m2 =0
 
         ms.drive(way * m1, way * m2)
-    ms.stop()
+    if stop_fl==1:
+        ms.stop()
 
 def turn(speed,time=400,fl=1):
     ms.drive(-speed,speed)
@@ -159,52 +160,19 @@ def turn(speed,time=400,fl=1):
     else:
         ms.stop()
 
-
-
-def pr():
-    while 1:
-        print(sens.dat(1), sens.dat(2), sens.dat(3), sens.dat(4))
-
 def black():
     global clr
-    pid_x_b(80, 0.5,0.1,3,boost_time=700)
+    pid_x_b(80, 0.5,0.1,3,boost_time=700,d=100)
 
     turn(-50)
-    boch.angle(90)
-    delay(600)
 
-    pid_x_b(40, 0.5,0.1,3,d=600)
-
-    ms.drive(-30, 30)
-    delay(1340)
-    ms.stop()
-
-    pid_t(-40, 0.5,0.1,3, 600,-1,4,3)
-
-    boch.angle(-2)
-    cub.angle(0)
-    delay(500)
-
-    pid_x_b(50,  0.5,0.1,3,270)
+    sbor()
 
     turn(50)
 
     pid_x_b(80, 0.5,0.1,3,700)
 
-    turn(50,170,0)
-
-    ms.drive(-60, -60)
-    delay(1000)
-    ms.stop()
-    boch.angle(90)
-    delay(500)
-    ms.drive(40, 40)
-    delay(1500)
-    ms.stop()
-    boch.angle(-1)
-    delay(400)
-
-    turn(-50,800)
+    black_tank()
 
     pid_x_f(50,  0.5,0.1,3)
 
@@ -220,6 +188,43 @@ def black():
         led.led(1,10,100)
 
     pid_x_b(50,  0.5,0.1,3)
+def black_tank():
+    turn(50, 300, 0)
+
+    ms.drive(-55, -60)
+    delay(800)
+    ms.stop()
+    boch.angle(90)
+    delay(500)
+    ms.drive(37, 40)
+    delay(1300)
+    ms.stop()
+    boch.angle(0)
+    delay(400)
+
+    turn(-50, 550)
+def sbor():
+    boch.angle(89)
+    delay(600)
+
+    pid_x_b(40, 0.5, 0.1, 3, d=470)
+
+    ms.drive(-33, 26)
+    delay(960)
+    ms.drive(-32, 26)
+    delay(960)
+    ms.stop()
+
+    ms.drive(-40, -20)
+    delay(120)
+    pid_t(40, 0.5, 0.1, 3, 400, -1, 4, 3, stop_fl=0)
+    cub.angle(0)
+    pid_t(20, 0.5, 0.1, 3, 250, -1, 4, 3)
+
+    boch.angle(0)
+    delay(500)
+
+    pid_x_b(50, 0.5, 0.1, 3, 270)
 
 def blue():
     turn(50)
@@ -228,58 +233,45 @@ def blue():
 
     turn(50)
 
-    pid_t(-40,0.4,0.1,800)
+    pid_t(40, 0.5, 0.1, 3, 600, -1, 4, 3)
 
-    boch.angle(91)
-    delay(300)
-
-    pid_x_b(50, 0.4, 0.11, 700)
-
-    ms.drive(-30, 30)
-    delay(1350)
-    ms.stop()
-
-    pid_t(-40, 0.3, 0.09, 600)
-
-    boch.angle(-2)
-    cub.angle(0)
-    delay(500)
-
-    pid_x_b(50, 0.6, 0.04, 270)
+    sbor()
 
     turn(-50)
 
-    pid_x_b(100, 0.6, 0.07, 250)
+    pid_x_b(80, 0.5, 0.1, 3, 250)
 
+    blue_tank()
+
+
+
+def blue_tank():
     turn(-50)
 
-    pid_x_b(50, 0.6, 0.07, 270)
+    pid_x_b(50, 0.5, 0.1, 3, d=200)
 
-    ms.drive(-40,0)
-    delay(700)
-    ms.stop()
+    turn(50,700,0)
 
-    ms.drive(-60,-60)
-    delay(1500)
+    ms.drive(-60, -60)
+    delay(1060)
     ms.stop()
     boch.angle(90)
     delay(300)
     ms.drive(40, 40)
-    delay(1000)
+    delay(1040)
     boch.angle(0)
-    delay(1250)
+    delay(500)
     ms.stop()
 
-    ms.drive(30, -40)
+    ms.drive(0, 40)
+    delay(600)
+    ms.drive(45, 40)
     delay(300)
+    ms.drive(45, 0)
+    delay(550)
     ms.stop()
 
-    ms.drive(30,30)
-    delay(400)
-    ms.stop()
-
-    pid_x_f(30,0.6,0.1,500)
-
+    pid_x_f(40, 0.6, 0.1, 500)
 def col():
     c=[0,0,0]
     for i in range(1000):
@@ -327,7 +319,7 @@ def main():
     delay(300)
 
     ms.drive(63, 60)
-    delay(600)
+    delay(300)
 
     YELLOW.on()
     pid_x_f(50, 0.5,0.1,3,d=180)
@@ -337,10 +329,10 @@ def main():
     black()
 
     blue()
-
-    turn(-50)
-
-    pid_x_f(100,0.3,0.1,600)
+    #
+    # turn(-50)
+    #
+    # pid_x_f(100,0.3,0.1,600)
 
 
 

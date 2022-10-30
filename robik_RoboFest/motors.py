@@ -29,11 +29,11 @@ class motor:
         nval=((val-min1)/(max1-min1))*max2+min2
         return nval
     def drive(self,spA,spB):
-        if spA > 255:
-            spA = 255
-        if spA < -255:
-            spA = -255
-        spA=self.calc(spA,0,255,0,100)
+        if spA > 100:
+            spA = 100
+        if spA < -100:
+            spA = -100
+
         if spA > 0:
             self.Ma1.low()
             self.Ma2.high()
@@ -47,7 +47,7 @@ class motor:
             spB=100
         if spB <-100:
             spB =-100
-        spB=self.calc(spB,0,255,0,100)
+
         if spB > 0:
             self.Mb1.low()
             self.Mb2.high()

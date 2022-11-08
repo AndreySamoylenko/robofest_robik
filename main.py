@@ -9,7 +9,8 @@ boch = pyb.Servo(1)  # пин для сервопривода
 boch.angle(0)
 cub = pyb.Servo(2)  # пин для сервопривода
 cub.angle(-89)
-
+delay(1000)
+cub.angle(89)
 
 
 RED = pyb.LED(1)
@@ -17,8 +18,8 @@ GREEN = pyb.LED(2)  # пины для встроенных светодиодо�
 YELLOW = pyb.LED(3)
 BLUE = pyb.LED(4)
 
-ms = motor('X7', 'X6', 'X8', 'X4', 'X5', 'X3')
-sens = sensor('X11', 'X12', 'Y11', 'Y12')
+ms = motor('X9', 'Y8', 'Y7', 'X10', 'X11', 'Y2')
+sens = sensor('X6', 'X7', 'Y11', 'Y12','X8')
 led=RGB('Y7','Y8','Y6')
 color=col('Y1','Y2','Y3')
 p_in = Pin('Y9', Pin.IN, Pin.PULL_UP)

@@ -19,7 +19,7 @@ class motor:
         self.Mb2 = Pin(self.b1, Pin.OUT_PP)
 
         self.Spa = Pin(self.pwma)
-        self.tim1 = Timer(14, freq=10000)
+        self.tim1 = Timer(12, freq=10000)
         self.ch1 = self.tim1.channel(1, Timer.PWM, pin=self.Spa)  # пины для работы с драйвером
 
         self.Spb = Pin(self.pwmb)

@@ -7,11 +7,16 @@ class RGB:
         self.Sr = Pin(pinr)
         self.Sg = Pin(ping)
         self.Sb = Pin(pinb)
-        self.tim1 = Timer(1, freq=10000)
-        self.ch3 = self.tim1.channel(1, Timer.PWM, pin=self.Sr)
-        self.ch2 = self.tim1.channel(2, Timer.PWM, pin=self.Sg)
-        self.ch1 = self.tim1.channel(3, Timer.PWM, pin=self.Sb)
     def led(self,R,G,B):
-        self.ch3.pulse_width_percent(R)
-        self.ch2.pulse_width_percent(G)
-        self.ch1.pulse_width_percent(B)
+        if R!=0:
+            self.Sr.high()
+        else:
+            self.Sr.low()
+        if G != 0:
+            self.Sg.high()
+        else:
+            self.Sg.low()
+        if B != 0:
+            self.Sb.high()
+        else:
+            self.Sb.low()

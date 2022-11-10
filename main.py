@@ -9,8 +9,7 @@ boch = pyb.Servo(1)  # пин для сервопривода
 boch.angle(0)
 cub = pyb.Servo(2)  # пин для сервопривода
 cub.angle(-89)
-delay(1000)
-cub.angle(89)
+
 
 
 RED = pyb.LED(1)
@@ -20,10 +19,9 @@ BLUE = pyb.LED(4)
 
 ms = motor('X9', 'Y8', 'Y7', 'X10', 'X11', 'Y2')
 sens = sensor('X6', 'X7', 'Y11', 'Y12','X8')
-led=RGB('Y7','Y8','Y6')
-color=col('Y1','Y2','Y3')
-p_in = Pin('Y9', Pin.IN, Pin.PULL_UP)
-b = Pin('X10', Pin.IN)
+led=RGB('X3','X4','X5')
+color=col('Y4','Y5','Y6')
+p_in = Pin('Y1', Pin.IN, Pin.PULL_UP)
 
 u = 0
 kp = 0.15
@@ -61,7 +59,7 @@ def pid_x(speed,kp,ki,kd,d1,d2,boost_time,stop_delay,way):
     kp1,kd1,ki1=kp/2,kd/2,ki/2
     sp=0
     min_sp=-10
-    while D1<88 or D2<88:
+    while D1<70 or D2<70:
         D1 = dat(d1)
         D2 = dat(d2)
         e=D1-D2
@@ -105,14 +103,16 @@ def pid_x(speed,kp,ki,kd,d1,d2,boost_time,stop_delay,way):
 
         ms.drive(way*m1,way*m2)
 
-    ms.drive(way*40, 40*way)
+    ms.drive(way*30, 30*way)
+    while sens.x()<1500:
+        pass
     delay(stop_delay)
     ms.stop()
 
-def pid_x_b(speed, kp, ki, kd,boost_time=400, d=180):
+def pid_x_b(speed, kp, ki, kd,boost_time=400, d=0):
     pid_x(speed,kp,ki,kd,4,3,boost_time,d,-1)
 
-def pid_x_f(speed, kp, ki, kd,boost_time=400, d=180):
+def pid_x_f(speed, kp, ki, kd,boost_time=400, d=0):
     pid_x(speed,kp,ki,kd,1,2,boost_time,d,1)
 
 def pid_t(speed, kp, ki, kd, time,way, d1=1,d2=2,stop_fl=1):
@@ -151,7 +151,7 @@ def pid_t(speed, kp, ki, kd, time,way, d1=1,d2=2,stop_fl=1):
     if stop_fl==1:
         ms.stop()
 
-def turn(speed,time=370,fl=1):
+def turn(speed,time=330,fl=1):
     ms.drive(-speed,speed)
     delay(time)
     d1,d2=1,2
@@ -167,31 +167,31 @@ def black():
     turn(-50)
     sbor()
     turn(50)
-    pid_x_b(80, 0.5, 0.1, 3, boost_time=700, d=100)
+    pid_x_b(80, 0.5, 0.1, 3, boost_time=600, d=40)
     black_tank()
 
 def black_tank():
-    turn(50, 300, 0)
+    turn(50, 230, 0)
 
-    ms.drive(-55, -60)
-    delay(800)
+    ms.drive(-60, -60)
+    delay(500)
     ms.stop()
     boch.angle(90)
-    delay(500)
-    ms.drive(37, 40)
-    delay(1300)
+    delay(300)
+    ms.drive(40, 40)
+    delay(755)
     ms.stop()
     boch.angle(0)
-    delay(400)
+    delay(300)
 
-    turn(-50, 600)
+    turn(-50, 500)
 
 def blue():
     led.led(0,0,100)
     turn(50)
     sbor()
     turn(-50)
-    pid_x_b(80, 0.5, 0.1, 3, boost_time=700, d=100)
+    pid_x_b(80, 0.5, 0.1, 3, boost_time=600)
     blue_tank()
 
 def blue_tank():
@@ -199,22 +199,23 @@ def blue_tank():
 
     pid_x_b(50, 0.5, 0.1, 3, d=200)
 
-    turn(50, 280, 0)
+    turn(50, 180, 0)
 
     ms.drive(-60, -60)
-    delay(1060)
+    delay(660)
     ms.stop()
     boch.angle(90)
     delay(300)
     ms.drive(40, 40)
-    delay(1090)
+    delay(390)
     boch.angle(0)
-    delay(500)
+    delay(600)
     ms.stop()
 
-    turn(-50,280)
-
-    pid_x_f(40, 0.6, 0.1,3, d=300)
+    turn(-50,180,0)
+    ms.drive(40,40)
+    delay(200)
+    pid_x_f(40, 0.6, 0.1,3)
 
 def green():
     turn(-50)
@@ -241,34 +242,34 @@ def green_tank():
     delay(500)
     ms.stop()
 
-    ms.drive(20,40)
-    delay(400)
-    ms.stop()
+    turn(50, 360, 0)
 
+    ms.drive(40,40)
+    delay(200)
     pid_x_f(40, 0.6, 0.1, 3, d=300)
 
 def sbor():
-    pid_t(40, 0.5, 0.2, 4, 600, -1, 4, 3)
+    pid_t(40, 0.5, 0.2, 4, 400, -1, 4, 3)
 
     boch.angle(85)
     delay(600)
 
-    pid_x_b(40, 0.5, 0.1, 3, d=510)
+    pid_x_b(30, 0.5, 0.1, 2, d=320)
 
-    ms.drive(-45,30)
-    delay(1550)
+    ms.drive(-30,30)
+    delay(1330)
     ms.stop()
 
     ms.drive(-40, -40)
     delay(120)
-    pid_t(40, 0.5, 0.1, 3, 400, -1, 4, 3, stop_fl=0)
+    pid_t(40, 0.5, 0.1, 3, 200, -1, 4, 3, stop_fl=0)
     cub.angle(0)
     pid_t(20, 0.5, 0.1, 3, 250, -1, 4, 3)
 
     boch.angle(0)
     delay(500)
 
-    pid_x_b(50, 0.5, 0.1, 3, 270)
+    pid_x_b(50, 0.5, 0.1, 3, 270,d=40)
 
 def col():
     c=[0,0,0]
@@ -308,26 +309,27 @@ def main():
         Min[i] = int(f.readline())
     f.close()
 
+    while p_in.value() == 1:
+        pass
 
-    while p_in.value() == 0:
-        delay(1)
 
     YELLOW.off()
     cub.angle(-82)
     delay(300)
 
-    ms.drive(66, 60)
-    delay(300)
+    ms.drive(60, 60)
+    delay(260)
 
     YELLOW.on()
+    pid_t(50,0.3,0.2,2,100,1,stop_fl=0)
     pid_x_f(50, 0.5,0.1,3)
 
     turn(-50)
-    pid_x_b(100, 0.5, 0.1, 3, boost_time=600, d=140)
+    pid_x_b(100, 0.5, 0.1, 3, boost_time=300)
 
     black()
 
-    pid_x_f(50,0.5,0.1,3)
+    pid_x_f(50,0.5,0.1,3,d=50)
 
     cub.angle(-100)
     delay(200)
@@ -335,11 +337,11 @@ def main():
     pid_x_b(50,0.5,0.1,3)
 
     turn(50)
-    pid_x_b(100, 0.5,0.1,3,boost_time=600,d=140)
+    pid_x_b(100, 0.5,0.1,3,boost_time=300)
 
     blue()
     turn(-50)
-    pid_x_f(100, 0.5, 0.1, 3, boost_time=600, d=140)
+    pid_x_f(100, 0.5, 0.1, 3, boost_time=300)
     cub.angle(-100)
     # # if not color1=='yellow':
     # #     turn(50)
@@ -388,7 +390,7 @@ def main():
 
 def pr():
     while 1 :
-        print(sens.dat(1),sens.dat(2),sens.dat(3),sens.dat(4))
+        print(sens.dat(1),sens.dat(2),sens.dat(3),sens.dat(4),sens.x())
         delay(10)
 
 print("starting ---> SUCCESSFUL")
@@ -397,7 +399,7 @@ print("starting ---> SUCCESSFUL")
 def calibration():
     f = open("calibration.txt", 'w')
     BLUE.on()
-    while p_in.value() == 0:
+    while p_in.value() == 1:
         delay(1)
     delay(100)
     for i in range(1000):
@@ -409,7 +411,7 @@ def calibration():
     r_min.sort()
     print(l_min, r_min)
     BLUE.off()
-    while p_in.value() == 0:
+    while p_in.value() == 1:
         delay(1)
     delay(100)
     for i in range(1000):
@@ -425,7 +427,7 @@ def calibration():
     f.write(str(r_min[500]) + '\n')
 
     RED.on()
-    while p_in.value() == 0:
+    while p_in.value() == 1:
         delay(1)
     delay(100)
     for i in range(1000):
@@ -436,7 +438,7 @@ def calibration():
     r_min.sort()
 
     RED.off()
-    while p_in.value() == 0:
+    while p_in.value() == 1:
         delay(1)
     delay(100)
     for i in range(1000):
@@ -453,7 +455,7 @@ def calibration():
     f.close()
     GREEN.on()
 
-if b.value() == 0:
-    calibration()
-else:
-    main()
+# if b.value() == 0:
+#calibration()
+# else:
+main()

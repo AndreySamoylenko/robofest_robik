@@ -23,13 +23,8 @@ class motor:
         self.ch1 = self.tim1.channel(1, Timer.PWM, pin=self.Spa)  # пины для работы с драйвером
 
         self.Spb = Pin(self.pwmb)
-        self.tim = Timer(8, freq=10000)
+        self.tim = Timer(12, freq=10000)
         self.ch2 = self.tim.channel(2, Timer.PWM, pin=self.Spb)
-
-    def calc(self,val,min1,max1,min2,max2):
-        nval=((val-min1)/(max1-min1))*max2+min2
-        return nval
-
     def drive(self,spA,spB):
         if spA > 100:
             spA = 100
@@ -63,4 +58,4 @@ class motor:
         self.Mb1.high()
         self.Ma2.high()
         self.Mb2.high()
-        pyb.delay(200)
+        pyb.delay(140)

@@ -24,10 +24,10 @@ color_f=col('X19','X17','X18')
 color_b=col('X20','X22','X21')
 p_in = Pin('Y12', Pin.IN, Pin.PULL_UP)
 
-l_min = list(range(1000))
-r_min = list(range(1000))
-l_max = list(range(1000))
-r_max = list(range(1000))
+l_f = list(range(1000))
+r_f = list(range(1000))
+l_b = list(range(1000))
+r_b = list(range(1000))
 
 Max = [0, 0, 0, 0]
 Min = [0, 0, 0, 0]
@@ -44,7 +44,7 @@ cuzov=['black',None]
 
 col1,col2,col3=None,None,None
 
-def turn(speed,time=560,fl=1):
+def turn(speed,time=570,fl=1):
     ms.drive(-speed,speed)
     delay(time)
     d1,d2=1,2
@@ -81,61 +81,59 @@ def sbor():
 def calibration():
     while p_in.value() == 1:
         delay(1)
-
+    delay(100)
     f = open("calibration.txt", 'w')
     BLUE.on()
+    YELLOW.on()
     while p_in.value() == 1:
         delay(1)
     delay(100)
     for i in range(1000):
-        l_min[i] = int(sens.dat(1))
-        r_min[i] = int(sens.dat(2))
+        l_f[i] = int(sens.dat(1))
+        r_f[i] = int(sens.dat(2))
+        l_b[i] = int(sens.dat(3))
+        r_b[i] = int(sens.dat(4))
 
-
-    l_min.sort()
-    r_min.sort()
-    print(l_min, r_min)
+    l_f.sort()
+    r_f.sort()
+    l_b.sort()
+    r_b.sort()
+    print(l_f, r_f, l_b, r_b)
     BLUE.off()
-    while p_in.value() == 1:
-        delay(1)
-    delay(100)
-    for i in range(1000):
-        l_max[i] = int(sens.dat(1))
-        r_max[i] = int(sens.dat(2))
-
-    l_max.sort()
-    r_max.sort()
-    print(l_max, r_max)
-    f.write(str(l_max[500]) + '\n')
-    f.write(str(l_min[500]) + '\n')
-    f.write(str(r_max[500]) + '\n')
-    f.write(str(r_min[500]) + '\n')
+    YELLOW.off()
+    f.write(str(l_f[500]) + '\n')
+    f.write(str(r_f[500]) + '\n')
+    f.write(str(l_b[500]) + '\n')
+    f.write(str(r_b[500]) + '\n')
 
     RED.on()
     while p_in.value() == 1:
         delay(1)
+
     delay(100)
+    RED.on()
     for i in range(1000):
-        l_min[i] = int(sens.dat(3))
-        r_min[i] = int(sens.dat(4))
-    print(l_min, r_min)
-    l_min.sort()
-    r_min.sort()
+        l_f[i] = int(sens.dat(1))
+        r_f[i] = int(sens.dat(2))
+
+    l_f.sort()
+    r_f.sort()
+    print(l_f, r_f)
 
     RED.off()
     while p_in.value() == 1:
         delay(1)
     delay(100)
     for i in range(1000):
-        l_max[i] = int(sens.dat(3))
-        r_max[i] = int(sens.dat(4))
-    print(l_max, r_max)
-    l_max.sort()
-    r_max.sort()
-    f.write(str(l_max[500]) + '\n')
-    f.write(str(l_min[500]) + '\n')
-    f.write(str(r_max[500]) + '\n')
-    f.write(str(r_min[500]) + '\n')
+        l_b[i] = int(sens.dat(3))
+        r_b[i] = int(sens.dat(4))
+    print(l_b, r_b)
+    l_b.sort()
+    r_b.sort()
+    f.write(str(l_f[500]) + '\n')
+    f.write(str(r_f[500]) + '\n')
+    f.write(str(l_b[500]) + '\n')
+    f.write(str(r_b[500]) + '\n')
     RED.on()
     f.close()
     GREEN.on()
@@ -150,42 +148,64 @@ def start():
 
 def long_road(way):
     if way==1:
-        pid_x_f(100,0.5,0.1,3,d=100)
+        pid_x_f(100,0.5,0.1,3,d=50)
     elif way==-1:
-        pid_x_b(100, 0.5, 0.1, 3, d=100)
+        pid_x_b(100, 0.5, 0.1, 3, d=50)
 
 def scan(way,x_fl=0,servo_if_color='any'):
+    col = ''
     if way==1:
         if x_fl==0:
-            pid_t(50,0.5,0.1,3,200,way)
+            pid_t(40,0.5,0.1,3,600,way)
             ms.stop()
-            col=colour(100)[0]
-            if servo_if_color==col or servo_if_color=='any':
+            cub_f.angle(-90)
+            delay(200)
+            col = colour(150)[1]
+            if servo_if_color == col or servo_if_color == 'any':
                 cub_f.angle(-90)
-            pid_t(50,0.5,0.1,3,200,-way,4,3)
+            else:
+                cub_f.angle(90)
+            delay(200)
+            pid_x_b(45,0.5,0.2,3)
 
         elif x_fl==1:
-            pid_x_f(50,0.5,0.2,3)
-            col = colour(100)[0]
-            if servo_if_color == col or servo_if_color=='any':
+            pid_x_f(35,0.5,0.2,3,d=100)
+            cub_f.angle(-90)
+            delay(200)
+            col = colour(150)[1]
+            if servo_if_color == col or servo_if_color == 'any':
                 cub_f.angle(-90)
-            pid_x_b(50,0.5,0.2,3)
+            else:
+                cub_f.angle(90)
+            delay(200)
+            pid_x_b(45,0.5,0.2,3,d=260)
 
     elif way==-1:
         if x_fl == 0:
-            pid_t(50, 0.5, 0.1, 3, 200, way,4,3)
+            pid_t(40, 0.5, 0.1, 3, 400, way,4,3)
             ms.stop()
-            col = colour(100)[1]
+            cub_b.angle(-90)
+            delay(200)
+            col = colour(150)[0]
             if servo_if_color == col or servo_if_color=='any':
-                cub_f.angle(-90)
-            pid_t(50, 0.5, 0.1, 3, 200, -way)
+                cub_b.angle(-90)
+            else:
+                cub_b.angle(90)
+            delay(200)
+            pid_x_f(45, 0.5, 0.2, 3)
 
-        else:
-            pid_x_b(50, 0.5, 0.2, 3)
-            col = colour(100)[1]
-            if servo_if_color == col or servo_if_color=='any':
-                cub_f.angle(-90)
-            pid_x_f(50, 0.5, 0.2, 3)
+        elif x_fl==1:
+            pid_x_b(35, 0.5, 0.2, 3,d=100)
+            delay(100)
+            cub_b.angle(-90)
+            delay(200)
+            col = colour(150)[0]
+            if servo_if_color == col or servo_if_color == 'any':
+                cub_b.angle(-90)
+            else:
+                cub_b.angle(90)
+            delay(200)
+            pid_x_f(45, 0.5, 0.2, 3)
 
     return col
 
@@ -194,12 +214,12 @@ def cub(way):
         pid_t(60, 0.5, 0.1, 3, 200, way,4,3)
         cub_b.angle(-90)
         delay(100)
-        pid_t(60, 0.5, 0.1, 3, 200, -way, 4, 3)
+        pid_t(60, 0.5, 0.1, 3, 200, -way)
     else:
-        pid_t(60, 0.5, 0.1, 3, 200, way,4,3)
+        pid_t(60, 0.5, 0.1, 3, 200, way)
         cub_f.angle(-90)
         delay(100)
-        pid_t(60, 0.5, 0.1, 3, 200, -way)
+        pid_t(60, 0.5, 0.1, 3, 200, -way,4,3)
 
 def colour(n):
     R, G, B = 0, 0, 0
@@ -261,13 +281,23 @@ def dat(d):
 def sbor_l():
     pid_t(50, 0.5, 0.2, 4, 400, -1, 4, 3)
 
-    boch_l.angle(0)
+    boch_l.angle(7)
     delay(200)
 
-    pid_x_b(50, 0.5, 0.1, 2, d=640)
+    pid_x_b(50, 0.5, 0.1, 2, d=690)
 
-    ms.drive(-40, 40)
-    delay(1560)
+    ms.drive(-43, 43)
+    delay(1060)
+    a,b=sens.pre_x()
+    while b>1600:
+        RED.on()
+        a, b = sens.pre_x()
+    a, b = sens.pre_x()
+    while b < 2500:
+        RED.on()
+        a, b = sens.pre_x()
+    RED.off()
+    delay(210)
     ms.stop()
 
     ms.drive(-40, -40)
@@ -277,77 +307,44 @@ def sbor_l():
     pid_t(40, 0.5, 0.1, 3, 250, -1, 4, 3)
 
     boch_l.angle(-76)
-    delay(200)
+    delay(60)
 
-    pid_x_b(50, 0.5, 0.1, 3, d=260)
+    pid_x_b(50, 0.5, 0.1, 3, d=290)
 
 
 def sbor_r():
     pid_t(50, 0.5, 0.2, 4, 400, 1)
 
-    boch_r.angle(10)
+    boch_r.angle(20)
     delay(300)
 
-    pid_x_f(50, 0.5, 0.1, 2, d=640)
+    pid_x_f(50, 0.5, 0.1, 2, d=530)
 
-    ms.drive(40, -40)
-    delay(1260)
+    ms.drive(-43, 43)
+    delay(1060)
+    a, b = sens.pre_x()
+    while a > 2500:
+        RED.on()
+        a, b = sens.pre_x()
+    delay(10)
+    a, b = sens.pre_x()
+    while a < 3400:
+        RED.on()
+        a, b = sens.pre_x()
+    RED.off()
+    delay(200)
     ms.stop()
 
     ms.drive(40, 40)
-    delay(120)
-    pid_t(50, 0.5, 0.1, 3, 200, 1, stop_fl=0)
+    delay(180)
+    pid_t(50, 0.5, 0.1, 3, 300, 1, stop_fl=0)
     cub_b.angle(0)
-    pid_t(40, 0.5, 0.1, 3, 250, 1)
+    pid_t(40, 0.5, 0.1, 3, 200, 1)
 
     boch_r.angle(-60)
     delay(400)
 
     pid_x_f(50, 0.5, 0.1, 3, d=260)
-
-
-def razvoz():
-    if col1 == 'green':
-        turn(-50)
-        long_road(-1)
-        col3 = scan(-1, 0)
-        turn(-50)
-        sbor_l()
-        turn(50)
-        turn(50)
-        sbor_r()
-    elif col1 == 'blue':
-        turn(-50)
-        long_road(1)
-        col3 = scan(1, 0)
-        turn(50)
-        sbor_l()
-        turn(50)
-        turn(50)
-        sbor_r()
-    elif col2 == 'blue':
-        turn(50)
-        long_road(1)
-        col3 = scan(1, 0)
-        turn(50)
-        sbor_l()
-        turn(50)
-        turn(50)
-        sbor_r()
-    elif col2 == 'green':
-        turn(-50)
-        long_road(-1)
-        col3 = scan(-1, 0)
-        turn(-50)
-        sbor_l()
-        turn(50)
-        turn(50)
-        sbor_r()
-
-
-def cub_2():
-    global col2, col1, cub_list
-    if cub_list[1]=='green':
 
 
 

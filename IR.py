@@ -29,12 +29,6 @@ class sensor:
             flag=False
         return self.X.read()
 
-    def pre_x(self,way):
-        if way==1 and self.pre_x_f.read()>2600:
-            return 1
-        elif way==-1 and self.pre_x_b.read()>2600:
-            return 1
-        elif way==0 :
-            return self.pre_x_f.read(),self.pre_x_b.read()
-        else:
-            return 0
+    def pre_x(self):
+        return self.pre_x_f.read(),self.pre_x_b.read()
+

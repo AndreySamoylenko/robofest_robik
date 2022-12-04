@@ -1,130 +1,145 @@
 from pyb import delay, Pin, ADC, Timer,millis
 from blocks import *
 
-def blue_(col):
+def led(col):
     if col == 'blue':
         BLUE.on()
     else:
-        cub_list[1] = col
         if col == 'yellow':
             YELLOW.on()
         elif col == 'green':
             GREEN.on()
 
-
+#calibration()
 f = open('calibration.txt', 'r')
 for i in range(4):
-    Max[i] = int(f.readline())
     Min[i] = int(f.readline())
+for i in range(4):
+    Max[i] = int(f.readline())
 f.close()
+
+
+
 def main():
+    col1 = ''
+    col2 = ''
+    cub_back = ''
+    cub_forward = ''
+    #colol()
+    #pr()
     YELLOW.on()
+
     while p_in.value() == 1:
         delay(1)
+
     start()
+    cub_forward='black'
 
     turn(50)
     turn(50)
+
     col1 = scan(-1, 1, 'blue')
-    blue_(col1)
+    led(col1)
+    print(col1)
+    if col1=='blue':
+        cub_back=col1
 
     turn(50)
     long_road(-1)
 
-    col2=scan(-1,0,'blue')
-    blue_(col2)
-
+    if cub_back=='':
+        col2 = scan(-1, 0, 'blue')
+        led(col2)
+        print(col2)
+        if col2=='blue':
+            cub_back=col2
 
     turn(-50)
     sbor_l()
+    cub_forward=''
     turn(50)
 
-    if col2 == 'green':
-        cub(1)
-        GREEN.on()
+    if cub_back=='blue':
+        col2 = scan(1, 0, 'green')
+        led(col2)
+        print(col2)
+        if col2=='green':
+            cub_forward='green'
+
+    if col2=='green' and cub_forward=='':
+        col2 = scan(1, 0, 'any')
+        led(col2)
+        print(col2)
+        cub_forward=col2
 
     long_road(-1)
-
+    ms.stop()
     if col1=='green':
         turn(-50)
         pid_x_f(50, 0.5, 0.1, 3)
-        cub_b.angle(-90)
+        cub_f.angle(-90)
+        cub_forward='green'
         pid_x_b(50, 0.5, 0.1, 3)
-    turn(50)
+        turn(50)
 
-    # long_road(-1)
-    #
-    # Blue()
-    #
-    # sbor_l()
-    #
-    # yellow_delivery()
-    #
+    long_road(-1)
 
-
-
-def pr():
-    while 1 :
-        print(sens.dat(1),sens.dat(2),sens.dat(3),sens.dat(4),sens.x(),sens.pre_x(0))
-        delay(10)
-def Blue():
-    if col1=='yellow':
-        if col2=='green':
-            cub(-1)
-            turn(-50)
-            sbor_r()
-            turn(50)
-            turn(50)
-        else:
-            turn(-50)
-            sbor_r()
-            turn(50)
-            cub(1)
-            turn(50)
-    elif col2=='yellow':
-        if col1=='green':
-            cub(-1)
-            turn(-50)
-            sbor_r()
-            turn(50)
-            turn(50)
-        else:
-            turn(-50)
-            sbor_r()
-            turn(50)
-            cub(1)
-            turn(50)
-    else:
+    if cub_back=='':
+        col3=scan(-1,0,'any')
         turn(-50)
         sbor_r()
         turn(50)
         turn(50)
-def yellow_delivery():
-    if not col1=='yellow' and not col2=='yellow':
+    elif cub_back=='blue' and cub_forward=='':
+        turn(-50)
+        sbor_r()
         turn(50)
-        cub(-1)
-        long_road(1)
-        long_road(1)
+        col3=scan(1,0,'any')
         turn(50)
-    elif col2 =='yellow':
+    elif cub_back=='blue' and cub_forward=='green':
         turn(-50)
-        long_road(-1)
-        long_road(-1)
-        cub(-1)
-        turn(-50)
-    else:
-        turn(-50)
-        long_road(-1)
-        turn(-50)
-        pid_x_b(50, 0.5, 0.1, 3)
-        cub_b.angle(-90)
-        pid_x_f(50, 0.5, 0.1, 3)
+        sbor_r()
         turn(50)
-        long_road(-1)
-        turn(-50)
+        turn(50)
+
+
+    sbor_l()
+
+    # if col1=='yellow':
+    #     turn(50)
+    #     long_road(-1)
+    #     turn(50)
+    #     pid_x_b(50, 0.5, 0.1, 3)
+    #     cub_b.angle(-90)
+    #     pid_x_f(50, 0.5, 0.1, 3)
+    #     turn(-50)
+    #     long_road(-1)
+    #     turn(-50)
+    #     sbor_r()
+    #     turn(50)
+    #     long_road(1)
+    #     turn(50)
+    #
+    # elif col2=='yellow':
+    #
+    # else:
+
+
+
+def colol():
+    while 1:
+        print(colour(100))
+def pr():
+    while 1 :
+        print(sens.dat(1),sens.dat(2),sens.dat(3),sens.dat(4),sens.x(),sens.pre_x())
+        delay(10)
 print("starting ---> SUCCESSFUL")
 
 # if b.value() == 0:
 #calibration()
 # else:
 main()
+
+
+
+

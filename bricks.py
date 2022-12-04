@@ -28,9 +28,12 @@ err = 0
 sum = 0
 
 f = open('calibration.txt', 'r')
-for i in range(4):
-    Max[i] = int(f.readline())
-    Min[i] = int(f.readline())
+
+for i in range(8):
+    if i<4:
+        Min[i] = int(f.readline())
+    else:
+        Max[i-4] = int(f.readline())
 f.close()
 
 def colour(n,color_f,color_b):
@@ -138,10 +141,10 @@ def pid_x(speed,kp,ki,kd,d1,d2,boost_time,stop_delay,way):
     pyb.delay(stop_delay)
     ms.stop()
 
-def pid_x_b(speed, kp, ki, kd,boost_time=400, d=170):
+def pid_x_b(speed, kp, ki, kd,boost_time=400, d=260):
     pid_x(speed,kp,ki,kd,4,3,boost_time,d,-1)
 
-def pid_x_f(speed, kp, ki, kd,boost_time=400, d=170):
+def pid_x_f(speed, kp, ki, kd,boost_time=400, d=260):
     pid_x(speed,kp,ki,kd,1,2,boost_time,d,1)
 
 def pid_t(speed, kp, ki, kd, time,way, d1=1,d2=2,stop_fl=1):

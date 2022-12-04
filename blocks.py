@@ -284,7 +284,7 @@ def sbor_l():
     boch_l.angle(7)
     delay(200)
 
-    pid_x_b(50, 0.5, 0.1, 2, d=690)
+    pid_x_b(50, 0.5, 0.1, 2, d=710)
 
     ms.drive(-43, 43)
     delay(1060)
@@ -301,8 +301,8 @@ def sbor_l():
     ms.stop()
 
     ms.drive(-40, -40)
-    delay(120)
-    pid_t(50, 0.5, 0.1, 3, 200, -1, 4, 3, stop_fl=0)
+    delay(150)
+    pid_t(50, 0.5, 0.1, 3, 270, -1, 4, 3, stop_fl=0)
     cub_f.angle(0)
     pid_t(40, 0.5, 0.1, 3, 250, -1, 4, 3)
 
@@ -336,8 +336,8 @@ def sbor_r():
     ms.stop()
 
     ms.drive(40, 40)
-    delay(180)
-    pid_t(50, 0.5, 0.1, 3, 300, 1, stop_fl=0)
+    delay(140)
+    pid_t(50, 0.5, 0.1, 3, 200, 1, stop_fl=0)
     cub_b.angle(0)
     pid_t(40, 0.5, 0.1, 3, 200, 1)
 

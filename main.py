@@ -25,6 +25,7 @@ def main():
     col2 = ''
     cub_back = ''
     cub_forward = ''
+    yel_pos=0
     #colol()
     #pr()
     YELLOW.on()
@@ -43,6 +44,8 @@ def main():
     print(col1)
     if col1=='blue':
         cub_back=col1
+    elif col1=='yellow':
+        yel_pos=2
 
     turn(50)
     long_road(-1)
@@ -53,13 +56,15 @@ def main():
         print(col2)
         if col2=='blue':
             cub_back=col2
+        elif col2=='yellow':
+            yel_pos=1
 
     turn(-50)
     sbor_l()
     cub_forward=''
     turn(50)
 
-    if cub_back=='blue':
+    if col1=='blue':
         col2 = scan(1, 0, 'green')
         led(col2)
         print(col2)
@@ -67,14 +72,18 @@ def main():
             cub_forward='green'
 
     if col2=='green' and cub_forward=='':
-        col2 = scan(1, 0, 'any')
+        pid_t(70, 0.5, 0.1, 3, 400, 1)
+        cub_f.angle(-90)
+        delay(100)
+        pid_x_b(50, 0.5, 0.1, 3,d=280)
         led(col2)
         print(col2)
         cub_forward=col2
 
     long_road(-1)
-    ms.stop()
+
     if col1=='green':
+        ms.stop()
         turn(-50)
         pid_x_f(50, 0.5, 0.1, 3)
         cub_f.angle(-90)
@@ -85,7 +94,10 @@ def main():
     long_road(-1)
 
     if cub_back=='':
-        col3=scan(-1,0,'any')
+        pid_t(70, 0.5, 0.1, 3, 400, -1,4,3)
+        cub_b.angle(-90)
+        delay(100)
+        pid_x_f(50, 0.5, 0.1, 3)
         turn(-50)
         sbor_r()
         turn(50)
@@ -94,13 +106,17 @@ def main():
         turn(-50)
         sbor_r()
         turn(50)
-        col3=scan(1,0,'any')
+        pid_t(70,0.5,0.1,3,400,1)
+        cub_f.angle(-90)
+        delay(100)
+        pid_x_b(50, 0.5, 0.1, 3)
         turn(50)
     elif cub_back=='blue' and cub_forward=='green':
         turn(-50)
         sbor_r()
         turn(50)
         turn(50)
+        yel_pos=3
 
 
     sbor_l()

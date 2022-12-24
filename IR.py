@@ -23,10 +23,6 @@ class sensor:
             return self.br.read()
 
     def x(self):
-        if self.X.read()>2600:
-            flag=True
-        else:
-            flag=False
         return self.X.read()
 
     def pre_x(self):

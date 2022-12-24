@@ -4,9 +4,9 @@ from motors import motor
 from IR import sensor
 from color import col
 
-boch_l = Servo(1)  # пин для сервопривода
+boch_l = Servo(2)  # пин для сервопривода
 cub_f = Servo(3)
-boch_r = Servo(2)
+boch_r = Servo(1)
 cub_b = Servo(4)
 
 RED = LED(1)
@@ -15,9 +15,9 @@ YELLOW = LED(3)
 BLUE = LED(4)
 
 sens = sensor('X6', 'X7', 'X12', 'Y11','X8','X5','X11') # класс датчиков линии
-color_f=col('X19','X17','X18')      # пины датчиков цвета
-color_b=col('X20','X22','X21')
-p_in = Pin('Y12', Pin.IN, Pin.PULL_UP)  # пин кнопки
+color_b=col('X19','X17','X18')      # пины датчиков цвета
+color_f=col('X20','X22','X21')
+p_in = Pin('Y10', Pin.IN, Pin.PULL_UP)  # пин кнопки
 ms = motor('Y6', 'Y5', 'Y7', 'X10', 'X9', 'Y8')  # класс моторов
 
 Max = [0, 0, 0, 0]
@@ -82,7 +82,7 @@ def dat(d,Min,Max):
     nval = int(100 * float(D - Min[d - 1]) / (Max[d - 1] - Min[d - 1]))
     return nval
 
-def pid_x(speed,kp,ki,kd,d1,d2,boost_time,stop_delay,way):
+def pid_x(speed,kp,ki,kd,d1,d2,boost_time,stop_delay,way,x=1,stop_fl=1):
     global err, sum, error
     mil=pyb.millis()
     D1=dat(d1,Min,Max)
@@ -91,61 +91,63 @@ def pid_x(speed,kp,ki,kd,d1,d2,boost_time,stop_delay,way):
     kp1,kd1,ki1=kp/2,kd/2,ki/2
     sp=0
     min_sp=-10
-    while D1<70 or D2<70:
-        D1 = dat(d1,Min,Max)
-        D2 = dat(d2,Min,Max)
-        e=D1-D2
+    for i in range(x):
+        while D1<70 or D2<70:
+            D1 = dat(d1,Min,Max)
+            D2 = dat(d2,Min,Max)
+            e=D1-D2
 
-        if 20>e>-20:
-            e=0
+            if 20>e>-20:
+                e=0
 
-        if r==0:
-            k = (pyb.millis() - mil) / boost_time
+            if r==0:
+                k = (pyb.millis() - mil) / boost_time
 
-            sp=30+k*(speed-30)
+                sp=30+k*(speed-30)
 
-            if sp>speed:
-                r=1
-                kp1, kd1, ki1 = kp, kd, ki
-                min_sp=0.5*speed
-                sp=speed
-
-
-        error[err] = e
-        err = (err + 1) % 5
-        sum = sum + e - error[err]
-
-        u = e * kp1 + (e - error[err]) * kd1  + sum * ki1
-        u = round(u, 2)
+                if sp>speed:
+                    r=1
+                    kp1, kd1, ki1 = kp, kd, ki
+                    min_sp=0.5*speed
+                    sp=speed
 
 
-        m1 = sp - u
-        m2 = sp + u
+            error[err] = e
+            err = (err + 1) % 5
+            sum = sum + e - error[err]
+
+            u = e * kp1 + (e - error[err]) * kd1  + sum * ki1
+            u = round(u, 2)
 
 
-        if m1 > speed:
-            m1 = speed
-        if m2 > speed:
-            m2 = speed
+            m1 = sp - u
+            m2 = sp + u
 
-        if m1 < min_sp:
-            m1 =min_sp
-        if m2 < min_sp:
-            m2 =min_sp
 
-        ms.drive(way*m1,way*m2)
+            if m1 > speed:
+                m1 = speed
+            if m2 > speed:
+                m2 = speed
+
+            if m1 < min_sp:
+                m1 =min_sp
+            if m2 < min_sp:
+                m2 =min_sp
+
+            ms.drive(way*m1,way*m2)
 
     ms.drive(way*30, 30*way)
-    while sens.x()<2300:
+    while sens.x()<2400:
         pass
     pyb.delay(stop_delay)
-    ms.stop()
+    if stop_fl == 1:
+        ms.stop()
 
-def pid_x_b(speed, kp, ki, kd,boost_time=400, d=260):
-    pid_x(speed,kp,ki,kd,4,3,boost_time,d,-1)
+def pid_x_b(speed, kp, ki, kd,boost_time=400, d=260,x=1,stop_fl=1):
+    pid_x(speed,kp,ki,kd,4,3,boost_time,d,-1,x,stop_fl)
 
-def pid_x_f(speed, kp, ki, kd,boost_time=400, d=260):
-    pid_x(speed,kp,ki,kd,1,2,boost_time,d,1)
+def pid_x_f(speed, kp, ki, kd,boost_time=400, d=260,x=1,stop_fl=1):
+    pid_x(speed,kp,ki,kd,1,2,boost_time,d,1,x,stop_fl)
 
 def pid_t(speed, kp, ki, kd, time,way, d1=1,d2=2,stop_fl=1):
     global err, sum, error

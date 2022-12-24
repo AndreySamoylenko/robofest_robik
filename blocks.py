@@ -2,15 +2,15 @@ from bricks import *
 from pyb import *
 
 
-boch_l = Servo(1)  # пин для сервопривода
+boch_l = Servo(2)  # пин для сервопривода
 cub_f = Servo(3)
-boch_r = Servo(2)
+boch_r = Servo(1)
 cub_b = Servo(4)
 
 boch_l.angle(-75)
-cub_f.angle(90)
+cub_f.angle(89)
 boch_r.angle(-60)
-cub_b.angle(90)
+cub_b.angle(89)
 
 
 RED = LED(1)
@@ -20,9 +20,10 @@ BLUE = LED(4)
 
 ms = motor('Y6', 'Y5', 'Y7', 'X10', 'X9', 'Y8')
 sens = sensor('X6', 'X7', 'X12', 'Y11','X8','X5','X11')
-color_f=col('X19','X17','X18')
-color_b=col('X20','X22','X21')
-p_in = Pin('Y12', Pin.IN, Pin.PULL_UP)
+color_b=col('X19','X17','X18')
+color_f=col('X20','X22','X21')
+p_in = Pin('Y10', Pin.IN, Pin.PULL_UP)
+sharp=ADC(Pin('Y12'))
 
 l_f = list(range(1000))
 r_f = list(range(1000))
@@ -44,16 +45,77 @@ cuzov=['black',None]
 
 col1,col2,col3=None,None,None
 
-def turn(speed,time=570,fl=1):
+def turn(speed,way,time=230,fl=1):
+
     ms.drive(-speed,speed)
-    delay(time)
-    d1,d2=1,2
+    bl = 55
+    wh = 45
     if speed<0:
-        d1,d2=4,3
+        if way==1:
+            d=2
+        else:
+            d=4
+    else:
+        if way==1:
+            d=1
+        else:
+            d=3
+    delay(100)
+    while dat(d)>bl:
+        pass
+    delay(80)
+    while dat(d)<wh:
+        pass
+    delay(80)
     if fl==1:
-        pid_t(0, 0.6,0.1,3,250,speed/abs(speed),d1,d2)
+        if d==1 or d==2:
+            d1=1
+            d2=2
+        else:
+            d1=4
+            d2=3
+
+        pid_t(0, 0.6,0.1,3,time,speed/abs(speed),d1,d2)
     else:
         ms.stop()
+
+def turn_f(speed,way,time=300,fl=1):
+    ms.drive(-speed,speed)
+    bl = 55
+    wh = 45
+    if speed<0:
+        if way==1:
+            d=2
+        else:
+            d=4
+    else:
+        if way==1:
+            d=1
+        else:
+            d=3
+    delay(60)
+    while dat(d)>bl:
+        pass
+    delay(40)
+    while dat(d)<wh:
+        pass
+    delay(40)
+    if fl==1:
+        if d==1 or d==2:
+            d1=1
+            d2=2
+        else:
+            d1=4
+            d2=3
+
+        pid_t(0, 0.6,0.1,3,time,speed/abs(speed),d1,d2)
+    else:
+        ms.stop()
+
+def turn_t(speed,time):
+    ms.drive(-speed, speed)
+    delay(time)
+    ms.stop()
 
 def sbor():
     pid_t(50, 0.5, 0.2, 4, 400, -1, 4, 3)
@@ -141,22 +203,28 @@ def calibration():
 def start():
     YELLOW.on()
     ms.drive(60,60)
+    delay(200)
     cub_f.angle(-90)
     delay(200)
     pid_t(50,0.5,0.1,3,200,1,stop_fl=0)
     pid_x_f(50,0.5,0.1,3)
 
-def long_road(way):
+
+def long_road(way,x=1):
     if way==1:
-        pid_x_f(100,0.5,0.1,3,d=50)
+        pid_x_f(100,0.5,0.1,3,d=80,stop_fl=0)
+        if x==2:
+            pid_x_f(100,0.4,0.1,3,1,80)
     elif way==-1:
-        pid_x_b(100, 0.5, 0.1, 3, d=50)
+        pid_x_b(100, 0.5, 0.1, 3, d=80,stop_fl=0)
+        if x==2:
+            pid_x_b(100,0.4,0.1,3,1,80)
 
 def scan(way,x_fl=0,servo_if_color='any'):
     col = ''
     if way==1:
         if x_fl==0:
-            pid_t(40,0.5,0.1,3,600,way)
+            pid_t(50,0.5,0.1,3,700,way)
             ms.stop()
             cub_f.angle(-90)
             delay(200)
@@ -166,7 +234,7 @@ def scan(way,x_fl=0,servo_if_color='any'):
             else:
                 cub_f.angle(90)
             delay(200)
-            pid_x_b(45,0.5,0.2,3)
+            pid_x_b(55,0.5,0.2,3,1,stop_fl=0)
 
         elif x_fl==1:
             pid_x_f(35,0.5,0.2,3,d=100)
@@ -178,11 +246,11 @@ def scan(way,x_fl=0,servo_if_color='any'):
             else:
                 cub_f.angle(90)
             delay(200)
-            pid_x_b(45,0.5,0.2,3,d=260)
+            pid_x_b(45,0.5,0.2,3,1,stop_fl=0)
 
     elif way==-1:
         if x_fl == 0:
-            pid_t(40, 0.5, 0.1, 3, 400, way,4,3)
+            pid_t(40, 0.5, 0.1, 3, 600, way,4,3)
             ms.stop()
             cub_b.angle(-90)
             delay(200)
@@ -192,7 +260,7 @@ def scan(way,x_fl=0,servo_if_color='any'):
             else:
                 cub_b.angle(90)
             delay(200)
-            pid_x_f(45, 0.5, 0.2, 3)
+            pid_x_f(45, 0.5, 0.2, 3,1,stop_fl=0)
 
         elif x_fl==1:
             pid_x_b(35, 0.5, 0.2, 3,d=100)
@@ -205,7 +273,7 @@ def scan(way,x_fl=0,servo_if_color='any'):
             else:
                 cub_b.angle(90)
             delay(200)
-            pid_x_f(45, 0.5, 0.2, 3)
+            pid_x_f(45, 0.5, 0.2, 3,1,stop_fl=0)
 
     return col
 
@@ -278,6 +346,39 @@ def dat(d):
     nval = int(100 * float(D - Min[d - 1]) / (Max[d - 1] - Min[d - 1]))
     return nval
 
+def rovn(way,time):
+    if way==1:
+        ms.drive(30,30)
+        delay(250)
+        ms.stop()
+        mil=millis()
+        while millis()-mil<time:
+            if dat(3)>60:
+                m2=40
+            else:
+                m2=-20
+            if dat(4)>60:
+                m1=40
+            else:
+                m1=-20
+            ms.drive(m1,m2)
+    elif way==-1:
+        ms.drive(-30, -30)
+        delay(250)
+        ms.stop()
+        mil = millis()
+        while millis() - mil < time:
+            if dat(1) > 60:
+                m1 = -40
+            else:
+                m1 = 20
+            if dat(2) > 60:
+                m2 = -40
+            else:
+                m2 = 20
+            ms.drive(m1, m2)
+    ms.stop()
+
 def sbor_l():
     pid_t(50, 0.5, 0.2, 4, 400, -1, 4, 3)
 
@@ -286,65 +387,90 @@ def sbor_l():
 
     pid_x_b(50, 0.5, 0.1, 2, d=710)
 
-    ms.drive(-43, 43)
-    delay(1060)
-    a,b=sens.pre_x()
-    while b>1600:
+    ms.drive(-50, 45)
+    delay(860)
+    while sens.pre_x()[1]>1530:
         RED.on()
-        a, b = sens.pre_x()
-    a, b = sens.pre_x()
-    while b < 2500:
+    while sens.pre_x()[1] < 2500:
         RED.on()
-        a, b = sens.pre_x()
     RED.off()
-    delay(210)
+    delay(120)
     ms.stop()
+    rovn(-1,500)
 
     ms.drive(-40, -40)
-    delay(150)
-    pid_t(50, 0.5, 0.1, 3, 270, -1, 4, 3, stop_fl=0)
-    cub_f.angle(0)
-    pid_t(40, 0.5, 0.1, 3, 250, -1, 4, 3)
-
+    delay(120)
+    pid_t(50, 0.5, 0.1, 3, 350, -1, 4, 3)
     boch_l.angle(-76)
-    delay(60)
-
-    pid_x_b(50, 0.5, 0.1, 3, d=290)
-
+    delay(100)
+    pid_x_b(80, 0.5, 0.1, 3, d=290)
+    pid_x_f(80, 0.5, 0.1, 3, d=0)
+    cub_f.angle(0, 300)
+    pid_x_b(80, 0.5, 0.1, 3, d=180)
 
 def sbor_r():
-    pid_t(50, 0.5, 0.2, 4, 400, 1)
+    pid_t(60, 0.5, 0.2, 4, 400, 1)
 
     boch_r.angle(20)
     delay(300)
 
     pid_x_f(50, 0.5, 0.1, 2, d=530)
 
-    ms.drive(-43, 43)
-    delay(1060)
+    ms.drive(-50, 50)
+    delay(860)
     a, b = sens.pre_x()
-    while a > 2500:
+    while sens.pre_x()[0] > 2470:
         RED.on()
-        a, b = sens.pre_x()
     delay(10)
     a, b = sens.pre_x()
-    while a < 3400:
+    while sens.pre_x()[0]< 3400:
         RED.on()
-        a, b = sens.pre_x()
     RED.off()
-    delay(200)
+    delay(130)
     ms.stop()
+    rovn(1, 500)
 
     ms.drive(40, 40)
-    delay(140)
-    pid_t(50, 0.5, 0.1, 3, 200, 1, stop_fl=0)
-    cub_b.angle(0)
-    pid_t(40, 0.5, 0.1, 3, 200, 1)
+    delay(40)
+    pid_t(50, 0.5, 0.1, 3, 200, 1)
+    boch_r.angle(-62)
+    delay(100)
+    pid_x_f(60, 0.5, 0.1, 3, d=50)
+    pid_x_b(80, 0.5, 0.1, 3, d=0)
+    cub_b.angle(0, 300)
+    pid_x_f(80, 0.5, 0.1, 3, d=180)
 
-    boch_r.angle(-60)
-    delay(400)
+def sharp_print(fl=1):
+    lis = list(range(100))
+    while fl:
+        for i in range(100):
+            lis[i]=sharp.read()
+        lis.sort()
+        print(lis[50])
+    return lis[50]
 
-    pid_x_f(50, 0.5, 0.1, 3, d=260)
+def sharpe():
+    lis = list(range(100))
+    for i in range(100):
+        lis[i] = sharp.read()
+    lis.sort()
+    print(lis[50])
+    return lis[50]
 
-
+def sharp_pd(speed,kp,kd,time,distance,way=1):
+    lis=list(range(100))
+    mil=millis()
+    E=0
+    while millis()-mil<time:
+        for i in range(100):
+            lis[i]=sharp.read()
+        lis.sort()
+        print(lis[50])
+        e=distance-lis[50]
+        e/=10
+        u=e*kp+(e-E)*kd
+        E=e
+        m1,m2=speed-u,speed+u
+        ms.drive(way*m1,way*m2)
+    ms.stop()
 

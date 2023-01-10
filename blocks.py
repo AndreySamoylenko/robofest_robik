@@ -8,9 +8,9 @@ boch_r = Servo(1)
 cub_b = Servo(4)
 
 boch_l.angle(-75)
-cub_f.angle(89)
+cub_f.angle(80)
 boch_r.angle(-60)
-cub_b.angle(89)
+cub_b.angle(80)
 
 
 RED = LED(1)
@@ -60,46 +60,13 @@ def turn(speed,way,time=230,fl=1):
             d=1
         else:
             d=3
+    delay(80)
+    while dat(d)>bl:
+        pass
     delay(100)
-    while dat(d)>bl:
-        pass
-    delay(80)
     while dat(d)<wh:
         pass
-    delay(80)
-    if fl==1:
-        if d==1 or d==2:
-            d1=1
-            d2=2
-        else:
-            d1=4
-            d2=3
-
-        pid_t(0, 0.6,0.1,3,time,speed/abs(speed),d1,d2)
-    else:
-        ms.stop()
-
-def turn_f(speed,way,time=300,fl=1):
-    ms.drive(-speed,speed)
-    bl = 55
-    wh = 45
-    if speed<0:
-        if way==1:
-            d=2
-        else:
-            d=4
-    else:
-        if way==1:
-            d=1
-        else:
-            d=3
-    delay(60)
-    while dat(d)>bl:
-        pass
-    delay(40)
-    while dat(d)<wh:
-        pass
-    delay(40)
+    delay(20)
     if fl==1:
         if d==1 or d==2:
             d1=1
@@ -209,71 +176,74 @@ def start():
     pid_t(50,0.5,0.1,3,200,1,stop_fl=0)
     pid_x_f(50,0.5,0.1,3)
 
-
 def long_road(way,x=1):
     if way==1:
-        pid_x_f(100,0.5,0.1,3,d=80,stop_fl=0)
+        pid_x_f(100, 0.5, 0.1, 3, d=40,stop_fl=0,boost_time=300)
         if x==2:
-            pid_x_f(100,0.4,0.1,3,1,80)
+            pid_x_f(100, 0.5, 0.1, 3, d=40,stop_fl=0,boost_time=300)
+        else:
+            ms.stop()
     elif way==-1:
-        pid_x_b(100, 0.5, 0.1, 3, d=80,stop_fl=0)
+        pid_x_b(100, 0.5, 0.1, 3, d=40,stop_fl=0,boost_time=300)
         if x==2:
-            pid_x_b(100,0.4,0.1,3,1,80)
+            pid_x_b(100, 0.5, 0.1, 3, d=40,stop_fl=0,boost_time=300)
+        else:
+            ms.stop()
 
-def scan(way,x_fl=0,servo_if_color='any'):
+def scan(way,x_fl=0,servo_if_color='any',speed=50):
     col = ''
     if way==1:
         if x_fl==0:
-            pid_t(50,0.5,0.1,3,700,way)
+            pid_t(speed,0.5,0.1,3,22000/speed,way)
             ms.stop()
             cub_f.angle(-90)
             delay(200)
-            col = colour(150)[1]
+            col = colour(100)[1]
             if servo_if_color == col or servo_if_color == 'any':
                 cub_f.angle(-90)
             else:
-                cub_f.angle(90)
+                cub_f.angle(80)
             delay(200)
-            pid_x_b(55,0.5,0.2,3,1,stop_fl=0)
+            pid_x_b(speed,0.5,0.2,3,1,stop_fl=0,d=100)
 
         elif x_fl==1:
-            pid_x_f(35,0.5,0.2,3,d=100)
+            pid_x_f(speed,0.5,0.2,3,d=100)
             cub_f.angle(-90)
             delay(200)
-            col = colour(150)[1]
+            col = colour(100)[1]
             if servo_if_color == col or servo_if_color == 'any':
                 cub_f.angle(-90)
             else:
-                cub_f.angle(90)
+                cub_f.angle(80)
             delay(200)
-            pid_x_b(45,0.5,0.2,3,1,stop_fl=0)
+            pid_x_b(speed,0.5,0.2,3,1,stop_fl=0,d=100)
 
     elif way==-1:
         if x_fl == 0:
-            pid_t(40, 0.5, 0.1, 3, 600, way,4,3)
+            pid_t(speed, 0.5, 0.1, 3, 22000/speed, way,4,3)
             ms.stop()
             cub_b.angle(-90)
             delay(200)
-            col = colour(150)[0]
+            col = colour(100)[0]
             if servo_if_color == col or servo_if_color=='any':
                 cub_b.angle(-90)
             else:
-                cub_b.angle(90)
+                cub_b.angle(80)
             delay(200)
-            pid_x_f(45, 0.5, 0.2, 3,1,stop_fl=0)
+            pid_x_f(speed, 0.5, 0.2, 3,1,stop_fl=0,d=100)
 
         elif x_fl==1:
-            pid_x_b(35, 0.5, 0.2, 3,d=100)
+            pid_x_b(speed, 0.5, 0.2, 3,d=100)
             delay(100)
             cub_b.angle(-90)
             delay(200)
-            col = colour(150)[0]
+            col = colour(100)[0]
             if servo_if_color == col or servo_if_color == 'any':
                 cub_b.angle(-90)
             else:
-                cub_b.angle(90)
+                cub_b.angle(80)
             delay(200)
-            pid_x_f(45, 0.5, 0.2, 3,1,stop_fl=0)
+            pid_x_f(speed, 0.5, 0.2, 3,1,stop_fl=0,d=100)
 
     return col
 

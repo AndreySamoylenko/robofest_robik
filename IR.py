@@ -2,6 +2,8 @@
 from pyb import delay, Pin, ADC, Timer
 import pyb
 
+Max1=[3650,3085]
+Min1=[2300,805]
 class sensor:
     def __init__(self,front_l,front_r,back_l,back_r,X,prex1,prex2):
         self.fl = ADC(Pin(front_l))
@@ -26,5 +28,18 @@ class sensor:
         return self.X.read()
 
     def pre_x(self):
-        return self.pre_x_f.read(),self.pre_x_b.read()
+        nval=[0,0]
+        D = self.pre_x_f.read()
+        if D > Max1[0]: D = Max1[0]
+        if D < Min1[0]: D = Min1[0]
+        nval[0] = self.constrain(int(1000 * float(D - Min1[0]) / (Max1[0] - Min1[0])),100,900)
+        D = self.pre_x_b.read()
+        if D > Max1[1]: D = Max1[1]
+        if D < Min1[1]: D = Min1[1]
+        nval[1] = self.constrain(int(1000 * float(D - Min1[1]) / (Max1[1] - Min1[1])),100,900)
+        return nval
 
+    def constrain(self,val,min,max):
+        if val>max:val=max
+        if val<min:val=min
+        return val

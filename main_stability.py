@@ -168,7 +168,7 @@ def pr():
 
 def cooler_pr():
     while 1 :
-        print(dat(1),dat(2),dat(3),dat(4))
+        print(dat(1),dat(2),dat(3),dat(4),sens.pre_x())
         delay(10)
 
 def blue():

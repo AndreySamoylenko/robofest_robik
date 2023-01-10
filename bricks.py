@@ -36,6 +36,12 @@ for i in range(8):
         Max[i-4] = int(f.readline())
 f.close()
 
+
+def constrain(val, min, max):
+    if val > max: val = max
+    if val < min: val = min
+    return val
+
 def colour(n,color_f,color_b):
     R, G, B = 0, 0, 0
     col1 = ''
@@ -79,7 +85,7 @@ def dat(d,Min,Max):
     D = sens.dat(d)
     if D > Max[d - 1]: D = Max[d - 1]
     if D < Min[d - 1]: D = Min[d - 1]
-    nval = int(100 * float(D - Min[d - 1]) / (Max[d - 1] - Min[d - 1]))
+    nval = constrain(int(100 * float(D - Min[d - 1]) / (Max[d - 1] - Min[d - 1])),8,92)
     return nval
 
 def pid_x(speed,kp,ki,kd,d1,d2,boost_time,stop_delay,way,x=1,stop_fl=1):

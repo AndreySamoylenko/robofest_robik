@@ -179,23 +179,25 @@ def start():
 def long_road(way,x=1):
     if way==1:
         if x==1:
-            pid_x_f(100, 0.5, 0.1, 3, d=50,stop_fl=1,boost_time=300)
+            pid_x_f(100, 0.5, 0.1, 3, d=60,stop_fl=1,boost_time=700)
         if x==2:
-            pid_x_f(100, 0.5, 0.1, 3, d=50, stop_fl=0, boost_time=300)
-            pid_x_f(100, 0.5, 0.1, 3, d=50,stop_fl=1,boost_time=300)
+            pid_x_f(100, 0.5, 0.1, 3, d=0, stop_fl=0, boost_time=700)
+            pid_t(100, 0.5, 0.15, 4, 300, 1, 1, 2, 0)
+            pid_x_f(100, 0.5, 0.1, 3, d=60,stop_fl=1,boost_time=700)
 
     elif way==-1:
         if x == 1:
-            pid_x_b(100, 0.5, 0.1, 3, d=50, stop_fl=1, boost_time=300)
+            pid_x_b(100, 0.5, 0.1, 3, d=60, stop_fl=1, boost_time=700)
         if x == 2:
-            pid_x_b(100, 0.5, 0.1, 3, d=50, stop_fl=0, boost_time=300)
-            pid_x_b(100, 0.5, 0.1, 3, d=50, stop_fl=1, boost_time=300)
+            pid_x_b(100, 0.5, 0.1, 3, d=0, stop_fl=0, boost_time=700)
+            pid_t(100,0.5,0.15,4,300,-1,4,3,0)
+            pid_x_b(100, 0.5, 0.1, 3, d=60, stop_fl=1, boost_time=400)
 
 def scan(way,x_fl=0,servo_if_color='any',speed=50):
     col = ''
     if way==1:
         if x_fl==0:
-            pid_t(speed,0.5,0.1,3,22000/speed,way)
+            pid_t(speed,0.5,0.1,3,25000/speed,way)
             ms.stop()
             cub_f.angle(-90)
             delay(200)
@@ -221,7 +223,7 @@ def scan(way,x_fl=0,servo_if_color='any',speed=50):
 
     elif way==-1:
         if x_fl == 0:
-            pid_t(speed, 0.5, 0.1, 3, 22000/speed, way,4,3)
+            pid_t(speed, 0.5, 0.1, 3, 25000/speed, way,4,3)
             ms.stop()
             cub_b.angle(-90)
             delay(200)

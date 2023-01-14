@@ -1,5 +1,8 @@
+
+
 from pyb import delay, Pin, ADC, Timer,millis
 from blocks import *
+
 
 def led(col):
     if col == 'blue':
@@ -22,20 +25,22 @@ f.close()
 cub_back = ''
 col2 = ''
 cub_forward = ''
-yel_pos = 1
+yel_pos = 3
 
 def main():
     global cub_back,cub_forward,yel_pos
     col1 = ''
     col2 = ''
 
-    # while p_in.value() == 1:
-    #     delay(1)
-    #
-    # sbor_s()
+
+    # cooler_pr()
 
     while p_in.value() == 1:
         delay(1)
+    # barrels()
+    # while p_in.value() == 1:
+    #     delay(1)
+
 
     YELLOW.on()
     ms.drive(90, 90)
@@ -46,8 +51,8 @@ def main():
 
     cub_forward='black'
 
-    ms.drive(-60,60)
-    delay(370)
+    ms.drive(-50,50)
+    delay(500)
     turn(60,-1)
 
     col1 = scan(-1, 1, 'blue',65)
@@ -110,75 +115,52 @@ def main():
             yel_pos = 3
         long_road(-1)
     else:
-        long_road(-1,2)
+        long_road(-1,x=2)
 
+    if col1=='blue' and col2=='green':
+        yel_pos=3
     blue_s()
 
     green_s()
 
-    if yel_pos==3:
-        plotin_s(-1)
+    turn(-70,1)
 
-    if yel_pos==3:
-        long_road(1,2)
-        turn(65,1)
-    elif yel_pos==2:
-        long_road(1)
-        ms.stop()
-        cub_b.angle(0)
-        turn(65,-1)
-        pid_x_b(50, 0.5, 0.1, 3)
-        cub_b.angle(-90)
-        pid_x_f(50, 0.5, 0.1, 3)
-        turn(-65,1)
-        long_road(1)
-        turn(65,1)
-    elif yel_pos==1:
-        long_road(1)
-        ms.stop()
-        cub_b.angle(0)
-        turn(55,-1)
-        turn(55,-1)
-        long_road(-1)
-        pid_t(70, 0.5, 0.1, 3, 400, -1, 4, 3)
-        cub_b.angle(-90)
-        delay(100)
-        pid_x_f(50, 0.5, 0.1, 3, d=270)
-        turn(-55,1)
+    yel_grab()
 
     cub_b.angle(-80)
     cub_f.angle(-80)
-    yellow()
+
+    yellow_s()
+
     turn(-55,1)
-    pid_x_f(80,0.5,0.1,3,d=80)
-    turn(-55,-1)
-    pid_x_b(50, 0.5, 0.1, 3,d=360)
+    pid_x_f(90,0.6,0.1,4,d=50)
+    turn(55,1)
 
     barrels()
 
 def black_s():
     pid_t(70, 0.5, 0.2, 4, 300, -1, 4, 3)
 
-    boch_l.angle(7)
-    delay(200)
+    boch_l.angle(4,600)
+    delay(100)
 
-    pid_x_b(75, 0.5, 0.1, 2, d=550,boost_time=1)
+    pid_x_b(75, 0.5, 0.1, 2, d=540,boost_time=300)
 
     ms.drive(-50, 45)
     delay(860)
-    while sens.pre_x()[1]>1530:
+    while sens.pre_x()[1]>350:
         RED.on()
-    while sens.pre_x()[1] < 2500:
-        RED.on()
+    while sens.pre_x()[1] <750:
+        pass
     RED.off()
-    delay(120)
+    delay(80)
     ms.stop()
     ms.drive(-40, -40)
     delay(120)
     boch_l.angle(-76)
     delay(100)
-    cub_f.angle(0, 300)
-    pid_x_b(80, 0.5, 0.1, 3, d=160)
+    cub_f.angle(0, 400)
+    pid_x_b(80, 0.5, 0.1, 3, d=170)
 
 def blue_s():
     global cub_black
@@ -205,188 +187,262 @@ def plotin_s(way):
     if way==-1:
         cub_b.angle(0)
         delay(100)
-        pid_t(50, 0.5, 0.1, 3, 510, -1, 4, 3, 0)
-        turn_t(50, 390)
-        cub_b.angle(-75)
+        cub_b.angle(-80, 600)
+        pid_t(50, 0.5, 0.1, 3, 470, -1, 4, 3, 0)
+        cub_b.angle(-80)
+        delay(100)
+        turn_t(50, 360)
         delay(50)
         ms.drive(-60, -60)
-        delay(400)
-        cub_b.angle(-55)
+        delay(500)
+        ms.drive(60,60)
+        delay(570)
+        ms.stop()
         delay(100)
-        ms.stop()
-        cub_b.angle(-75)
-        delay(200)
-        ms.drive(50, 50)
-        delay(605)
-        ms.stop()
-        delay(200)
-        turn_t(-50, 370)
+        turn(-50,1)
         pid_x_f(60, 0.5, 0.1, 3,d=210,stop_fl=0)
     else:
         cub_f.angle(0)
         delay(100)
-        pid_t(50, 0.5, 0.1, 3, 510, 1,1,2, 0)
+        cub_f.angle(-80,600)
+        pid_t(50, 0.5, 0.1, 3, 470, 1,1,2,0)
+        cub_f.angle(-80)
+        delay(100)
         turn_t(50, 390)
-        cub_f.angle(-75)
         delay(50)
         ms.drive(60, 60)
-        delay(400)
-        cub_f.angle(-55)
+        delay(500)
+        ms.drive(-60, -60)
+        delay(570)
+        ms.stop()
         delay(100)
-        ms.stop()
-        cub_f.angle(-75)
-        delay(200)
-        ms.drive(-50, -50)
-        delay(605)
-        ms.stop()
-        delay(200)
-        turn_t(-50, 370)
+        turn(-50,-1)
         pid_x_b(60, 0.5, 0.1, 3, d=210, stop_fl=0)
+    ms.stop()
 
 def green_s():
-    black_s()
+    pid_t(70, 0.5, 0.2, 4, 300, -1, 4, 3)
 
-def yellow():
-    cub_b.angle(-90)
+    boch_l.angle(-18, 600)
     delay(100)
-    pid_t(60, 0.5, 0.2, 4, 400, 1)
 
-    boch_r.angle(30, 300)
-    delay(300)
+    pid_x_b(75, 0.5, 0.1, 2, d=600, boost_time=300)
 
-    pid_x_f(50, 0.5, 0.1, 2, d=550)
-
-    ms.drive(-50, 50)
-    delay(960)
-    while sens.pre_x()[0] > 3370:
+    ms.drive(-50, 45)
+    delay(860)
+    while sens.pre_x()[1] > 250:
         RED.on()
-    delay(10)
-    while sens.pre_x()[0] < 3500:
+    while sens.pre_x()[1] < 750:
         RED.on()
     RED.off()
-    delay(180)
+    delay(80)
     ms.stop()
-    delay(200)
-    # rovn(1, 500)
+    ms.drive(-40, -40)
+    delay(120)
+    boch_l.angle(-76,600)
+
+    pid_x_b(80, 0.5, 0.1, 3, d=160)
+    pid_x_f(80, 0.5, 0.1, 3, d=300,stop_fl=0)
 
     ms.drive(40, 40)
+    delay(160)
+    ms.drive(0, 60)
+    cub_f.angle(50)
+    delay(680)
+    ms.stop()
+    cub_f.angle(-60)
+    delay(350)
+    ms.drive(35, 35)
+    delay(700)
+    ms.stop()
+    delay(200)
+    ms.drive(-50, -50)
+    cub_f.angle(-80)
+    delay(190)
+    ms.drive(0, -60)
+    delay(610)
+
+    rovn(-1, 600)
+    pid_t(60, 0.5, 0.1, 3, 330, -1,4,3, stop_fl=0)
+    cub_f.angle(0)
+    pid_x_b(80, 0.5, 0.1, 3, d=150)
+    cub_f.angle(-80)
+
+def yel_grab():
+    if yel_pos==3:
+        plotin_s(-1)
+        long_road(1,2)
+        turn(65,1)
+    elif yel_pos==2:
+        long_road(1)
+        ms.stop()
+        cub_b.angle(0)
+        turn(65,-1)
+        pid_x_b(50, 0.5, 0.1, 3,d=300)
+        cub_b.angle(-90)
+        delay(100)
+        pid_x_f(50, 0.5, 0.1, 3)
+        turn(-65,1)
+        long_road(1)
+        turn(65,1)
+    elif yel_pos==1:
+        long_road(1)
+        ms.stop()
+        cub_b.angle(0)
+        turn(55,-1)
+        turn(55,-1)
+        long_road(-1)
+        pid_t(70, 0.5, 0.1, 3, 400, -1, 4, 3)
+        cub_b.angle(-90)
+        delay(100)
+        pid_x_f(50, 0.5, 0.1, 3, d=270)
+        turn(-55,1)
+
+def yellow_s():
+    pid_t(50,0.5,0.1,2,500,1,stop_fl=0)
+    boch_r.angle(7, 500)
+    pid_x_f(50, 0.5, 0.1, 2, d=510)
+
+    ms.drive(-50, 50)
+    delay(730)
+    while sens.pre_x()[0] > 350:
+        RED.on()
+    ms.drive(-40,40)
+    while sens.pre_x()[0] < 750:
+        RED.on()
+    ms.drive(-35,35)
+    RED.off()
+    delay(130)
+
+
+    ms.drive(50, 50)
     delay(100)
     pid_t(50, 0.5, 0.1, 3, 350, 1)
     boch_r.angle(-62)
     delay(100)
 
     pid_x_f(80, 0.5, 0.1, 3, d=290)
-    pid_x_b(80, 0.5, 0.1, 3, d=320)
+    pid_x_b(80, 0.5, 0.1, 3, d=320,stop_fl=0)
 
     ms.drive(-40, -40)
-    while dat(1) < 75 or dat(2) < 75:
-        pass
-    cub_b.angle(-75)
-    ms.drive(-25, -25)
-    delay(950)
-    ms.stop()
-    delay(300)
-    ms.drive(-35, 40)
-    a = 0
-    while a < 5:
-        if sharpe() > 665:
-            a += 1
-    ms.stop()
-    delay(800)
-    sharp_pd(48, 1, 1, 660, 655, 1)
-    ms.stop()
-    ms.drive(-34, -34)
-    delay(850)
-    ms.stop()
-    ms.drive(50, -50)
+    delay(200)
+    ms.drive(0, -60)
+    delay(650)
+    ms.drive(-40,-40)
     delay(560)
     ms.stop()
     delay(200)
+    ms.drive(50, 50)
+    delay(200)
+    ms.drive(0, 60)
+    delay(610)
+    ms.drive(50, 50)
+    delay(100)
 
-    ms.drive(50, 51)
-    while dat(3) < 40 or dat(4) < 40:
-        pass
-    while dat(3) > 60 or dat(4) > 60:
-        pass
-    rovn(1, 400)
-
-    delay(550)
-
-    pid_x_f(80, 0.5, 0.1, 3, d=290)
-    pid_x_b(80, 0.5, 0.1, 3, d=0)
-    cub_b.angle(0, 300)
-    pid_x_f(80, 0.5, 0.1, 3, d=120)
+    rovn(1,700)
+    pid_t(60,0.5,0.1,3,300,1,stop_fl=0)
+    cub_b.angle(0)
+    pid_x_f(80, 0.5, 0.1, 3, d=160)
     cub_b.angle(-80)
 
 def barrels():
-    ms.drive(40,0)
-    delay(200)
-    boch_r.angle(-30)
-    ms.drive(0,40)
-    delay(200)
+    pid_x_f(50, 0.6, 0.1, 4, d=370)
+
+    ms.drive(40,40)
+    delay(440)
     ms.stop()
-    delay(200)
-    ms.drive(-39, -40)
-    delay(240)
-    boch_r.angle(-60)
-    delay(850)
+    ms.drive(-50,50)
+    delay(490)
     ms.stop()
-    boch_l.angle(-42)
-    ms.drive(40, 40)
-    delay(200)
-    boch_l.angle(-72)
-    delay(240)
+    ms.drive(50, 50)
+    delay(500)
     ms.stop()
-    ms.drive(40, -40)
-    delay(810)
+    ms.drive(0,60)
+    delay(650)
+    ms.stop()
+    boch_r.angle(-20)
+    ms.drive(0,-60)
+    delay(250)
+    boch_r.angle(-64)
+    ms.drive(0, -60)
+    delay(480)
+    ms.stop()
+    boch_r.angle(-25)
+    delay(200)
+
+    ms.drive(-50,-50)
+    delay(450)
+    ms.stop()
+    rovn(1,800)
+    ms.drive(-50, -50)
+    delay(700)
     ms.stop()
 
-    ms.drive(40, 40)
-    delay(850)
-    ms.drive(-40,-40)
-    delay(200)
-    boch_r.angle(-40)
-    delay(200)
-    boch_r.angle(-60)
-    delay(1100)
-    ms.drive(40,40)
-    delay(200)
-    boch_l.angle(-42)
-    delay(200)
-    boch_l.angle(-72)
-    delay(360)
+    ms.drive(-60,0)
+    delay(650)
     ms.stop()
+    delay(200)
+    boch_l.angle(-20)
+    ms.drive(60,0)
+    delay(250)
+    boch_l.angle(-73)
+    ms.drive(60, 0)
+    delay(450)
+    ms.stop()
+    boch_l.angle(-25)
+    delay(200)
+
+    ms.drive(50,50)
+    delay(340)
+    rovn(-1, 800)
+    ms.drive(50, 50)
+    delay(300)
+    ms.stop()
+    boch_r.angle(-64)
+    boch_l.angle(-70)
+    cub_f.angle(-80)
+    cub_b.angle(-80)
 
 def sbor_s():
-    pid_t(70, 0.5, 0.2, 3, 400,way=1,d1=1,d2=2,stop_fl=1)
+    pid_t(70, 0.5, 0.2, 3, 400,1)
     ms.stop()
     boch_r.angle(27)
     delay(200)
 
-    pid_x_f(70, 0.5, 0.1, 2, d=500, boost_time=300)
+    pid_x_f(70, 0.5, 0.1, 2, d=470, boost_time=300)
 
-    ms.drive(-50, 45)
-    delay(860)
-    while sens.pre_x()[0] >750:
-        RED.on()
-    while sens.pre_x()[0] <250:
-        RED.on()
+    ms.drive(-50, 50)
+    delay(800)
+    RED.on()
+    while sens.pre_x()[0] > 350:
+        pass
+    while sens.pre_x()[0] < 750:
+        pass
     RED.off()
-    delay(140)
+    delay(130)
     ms.stop()
-    ms.drive(40, 40)
-    delay(120)
-    boch_r.angle(-70)
-    delay(100)
-    cub_b.angle(0, 300)
+    ms.drive(45, 45)
+    delay(140)
+    boch_r.angle(-67,500)
+    delay(160)
+    cub_b.angle(0, 400)
     pid_x_f(80, 0.5, 0.1, 3, d=160)
 
+def pr():
+    while 1 :
+        print(sens.dat(1),sens.dat(2),sens.dat(3),sens.dat(4),sens.x(),sens.pre_x_f.read(),sens.pre_x_b.read())
+        delay(50)
 
+def cooler_pr():
+    while 1 :
+        print(dat(1),dat(2),dat(3),dat(4),sens.pre_x())
+        delay(10)
 print("starting ---> SUCCESSFUL")
 
 # if b.value() == 0:
-#calibration()
+# calibration()
 # else:
+# cooler_pr()
 main()
 
 

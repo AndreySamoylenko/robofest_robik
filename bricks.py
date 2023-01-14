@@ -150,10 +150,18 @@ def pid_x(speed,kp,ki,kd,d1,d2,boost_time,stop_delay,way,x=1,stop_fl=1):
         ms.stop()
 
 def pid_x_b(speed, kp, ki, kd,boost_time=400, d=260,x=1,stop_fl=1):
-    pid_x(speed,kp,ki,kd,4,3,boost_time,d,-1,x,stop_fl)
+    pid_x(speed,kp,ki,kd,4,3,boost_time,d,-1,x,stop_fl=0)
+    if stop_fl==1:
+        ms.drive(100,100)
+        delay(20)
+        ms.stop()
 
 def pid_x_f(speed, kp, ki, kd,boost_time=400, d=260,x=1,stop_fl=1):
-    pid_x(speed,kp,ki,kd,1,2,boost_time,d,1,x,stop_fl)
+    pid_x(speed,kp,ki,kd,1,2,boost_time,d,1,x,stop_fl=0)
+    if stop_fl==1:
+        ms.drive(-100,-100)
+        delay(20)
+        ms.stop()
 
 def pid_t(speed, kp, ki, kd, time,way, d1=1,d2=2,stop_fl=1):
     global err, sum, error

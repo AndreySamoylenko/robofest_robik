@@ -178,17 +178,18 @@ def start():
 
 def long_road(way,x=1):
     if way==1:
-        pid_x_f(100, 0.5, 0.1, 3, d=40,stop_fl=0,boost_time=300)
+        if x==1:
+            pid_x_f(100, 0.5, 0.1, 3, d=50,stop_fl=1,boost_time=300)
         if x==2:
-            pid_x_f(100, 0.5, 0.1, 3, d=40,stop_fl=0,boost_time=300)
-        else:
-            ms.stop()
+            pid_x_f(100, 0.5, 0.1, 3, d=50, stop_fl=0, boost_time=300)
+            pid_x_f(100, 0.5, 0.1, 3, d=50,stop_fl=1,boost_time=300)
+
     elif way==-1:
-        pid_x_b(100, 0.5, 0.1, 3, d=40,stop_fl=0,boost_time=300)
-        if x==2:
-            pid_x_b(100, 0.5, 0.1, 3, d=40,stop_fl=0,boost_time=300)
-        else:
-            ms.stop()
+        if x == 1:
+            pid_x_b(100, 0.5, 0.1, 3, d=50, stop_fl=1, boost_time=300)
+        if x == 2:
+            pid_x_b(100, 0.5, 0.1, 3, d=50, stop_fl=0, boost_time=300)
+            pid_x_b(100, 0.5, 0.1, 3, d=50, stop_fl=1, boost_time=300)
 
 def scan(way,x_fl=0,servo_if_color='any',speed=50):
     col = ''
@@ -246,18 +247,6 @@ def scan(way,x_fl=0,servo_if_color='any',speed=50):
             pid_x_f(speed, 0.5, 0.2, 3,1,stop_fl=0,d=100)
 
     return col
-
-def cub(way):
-    if way==-1:
-        pid_t(60, 0.5, 0.1, 3, 200, way,4,3)
-        cub_b.angle(-90)
-        delay(100)
-        pid_t(60, 0.5, 0.1, 3, 200, -way)
-    else:
-        pid_t(60, 0.5, 0.1, 3, 200, way)
-        cub_f.angle(-90)
-        delay(100)
-        pid_t(60, 0.5, 0.1, 3, 200, -way,4,3)
 
 def colour(n):
     R, G, B = 0, 0, 0
@@ -319,34 +308,36 @@ def dat(d):
 def rovn(way,time):
     if way==1:
         ms.drive(30,30)
-        delay(250)
+        delay(50)
         ms.stop()
         mil=millis()
         while millis()-mil<time:
-            if dat(3)>60:
-                m2=40
-            else:
+            if dat(2)>40:
                 m2=-20
-            if dat(4)>60:
-                m1=40
             else:
+                m2=40
+            if dat(1)>40:
                 m1=-20
+            else:
+                m1=40
             ms.drive(m1,m2)
+            delay(1)
     elif way==-1:
         ms.drive(-30, -30)
-        delay(250)
+        delay(50)
         ms.stop()
         mil = millis()
         while millis() - mil < time:
-            if dat(1) > 60:
-                m1 = -40
-            else:
+            if dat(4) > 40:
                 m1 = 20
-            if dat(2) > 60:
-                m2 = -40
             else:
+                m1 = -40
+            if dat(3) > 40:
                 m2 = 20
+            else:
+                m2 = -40
             ms.drive(m1, m2)
+            delay(1)
     ms.stop()
 
 def sbor_l():

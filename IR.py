@@ -2,8 +2,8 @@
 from pyb import delay, Pin, ADC, Timer
 import pyb
 
-Max1=[3650,3085]
-Min1=[2300,805]
+Max1=[3720,3665]
+Min1=[2400,2465]
 class sensor:
     def __init__(self,front_l,front_r,back_l,back_r,X,prex1,prex2):
         self.fl = ADC(Pin(front_l))
